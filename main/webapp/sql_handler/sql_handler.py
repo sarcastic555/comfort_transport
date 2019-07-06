@@ -69,5 +69,7 @@ class sql_handler:
         print(self.cur.fetchall())
         self.cur.execute("SELECT * FROM {}".format(table_name))
         print(self.cur.fetchall())
-
+    def get_column_list(self, table_name):
+        self.cur.execute("SELECT * FROM {}".format(table_name))
+        return self.cur
         

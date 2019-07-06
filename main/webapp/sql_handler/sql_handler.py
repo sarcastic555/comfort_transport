@@ -1,12 +1,19 @@
 import mysql.connector
+import os
 
-class data_collector:
+class sql_handler:
     def __init__(self):
         self.host_name = ""
         self.port_num = 0
         self.user_name = ""
         self.password = ""
         self.db_name = ""
+    def check_env_setting(self):
+        if os.environ.get("env_defined") == "True":
+            return True
+        else:
+            return False
+
     def set_sql_param(self, param_dict):
         if "host_name" in param_dict:
             self.host_name = param_dict["host_name"]

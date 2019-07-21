@@ -1,39 +1,154 @@
-<!DOCTYPE html>
-<html>
+
+
+
+<!DOCTYPE html "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <title>Simple Map</title>
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="utf-8">
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>Google Maps JavaScript API サンプル</title>
+    <script type="text/javascript"
+      src="https://maps-api-ssl.google.com/maps/api/js?key=AIzaSyBFjkHYZugsHhFbmR4dp72Q66YQNAkPqg8&callback=initMap"></script>
   </head>
-  <body>
-    <div id="map"></div>
-    <script>
+  <body onload="initialize()">
+    <p>Comfort Transport Test</p>
+
+    <div id="map_canvas" style="width:500px; height:300px"></div>
+
+    <script type="text/javascript">
       var map;
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          zoom: 8
+      var marker;
+      var inforwindow;
+      var timeout_id = null;
+    
+      function initialize() {
+        
+        
+        var latlng = new google.maps.LatLng(35.680865,139.767036);
+        var opts = {
+          zoom: 14,
+          center: latlng,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        
+        var useragent = navigator.userAgent;
+        var mapdiv = document.getElementById("map_canvas");
+        if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1){
+          mapdiv.style.width = '100%';
+          mapdiv.style.height = '100%';
+        }
+        map = new google.maps.Map(mapdiv, opts);
+
+        //map = new google.maps.Map(document.getElementById("map_canvas"), opts);
+        marker = new google.maps.Marker({
+          position: latlng
         });
+        marker.setMap(map)
+        marker.setVisible(false);
+
+        
+        infowindow = new google.maps.InfoWindow({
+        });
+        infowindow.open(map);
+        infowindow.close();
       }
+
+      function toShinbashi() {
+        clearTimeout(timeout_id)
+        infowindow.close();
+        marker.setVisible(false);
+        map.panTo(new google.maps.LatLng(35.666397,139.758153));
+        var m_latlng = new google.maps.LatLng(35.666397,139.758153);;
+        marker = new google.maps.Marker({
+          position: m_latlng
+        });
+        marker.setMap(map);
+      }
+
+      function toShinagawa() {
+        clearTimeout(timeout_id)
+        infowindow.close();
+        marker.setVisible(false);
+        map.panTo(new google.maps.LatLng(35.629867,139.74015));
+        var m_latlng = new google.maps.LatLng(35.629867,139.74015);
+        infowindow = new google.maps.InfoWindow({
+          content: '品川駅',
+          position: m_latlng
+        });
+        infowindow.open(map);
+      }
+
+      function toTokyo() {
+        infowindow.close();
+        marker.setVisible(false);
+
+        if('lat' in toTokyo){
+          toTokyo.lat = toTokyo.lat + 0.0005;
+          toTokyo.lng = toTokyo.lng + 0.0005;  
+        }else{
+          toTokyo.lat = 35.680865;
+          toTokyo.lng = 139.767036
+        }
+        $a = 1;
+        
+        map.panTo(new google.maps.LatLng(35.680865,139.767036));
+        var m_latlng = new google.maps.LatLng(toTokyo.lat, toTokyo.lng);
+        var image = './icon.png';
+        marker = new google.maps.Marker({
+          position: m_latlng,
+          icon: image
+        });
+        marker.setMap(map);
+        timeout_id = setTimeout("toTokyo()", 1000);
+        
+      }
+
+      function toCurrent() {
+        function success(position) {
+          marker.setVisible(false);
+          map.panTo(new google.maps.LatLng(35.680865,139.767036));
+          var m_latlng = new google.maps.LatLng(35.680865,139.767036);
+          marker = new google.maps.Marker({
+            position: m_latlng
+          });
+          marker.setMap(map);
+        };
+        function error(err){
+          switch(err.code) {
+              case 1: // PERMISSION_DENIED
+                window.alert("位置情報の利用が許可されていません");
+                break;
+              case 2: // POSITION_UNAVAILABLE
+                window.alert("現在位置が取得できませんでした");
+                break;
+              case 3: // TIMEOUT
+                window.alert("タイムアウトになりました");
+                break;
+              default:
+                window.alert("その他のエラー(エラーコード:"+error.code+")");
+                break;
+            }
+          output.innerHTML = "座標位置を取得できません";
+        };
+        var output = document.getElementById("result");
+        if(navigator.geolocation){
+          navigator.geolocation.getCurrentPosition(success, error);
+        }   
+        if (!navigator.geolocation){//Geolocation apiがサポートされていない場合
+          output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
+          return;
+        }
+      }
+
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFjkHYZugsHhFbmR4dp72Q66YQNAkPqg8&callback=initMap"
-    async defer></script>
+
+    <form>
+    <p>
+    <input type="button" id="tokyo" value="東京" onclick="toTokyo()" />
+    <input type="button" id="shinbashi" value="新橋" onclick="toShinbashi()" />
+    <input type="button" id="shinagawa" value="品川" onclick="toShinagawa()" />
+    <input type="button" id="current" value="現在位置" onclick="toCurrent()" />
+    </p>
+    </form>
   </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> a3005c6a39721493bad4bcb78b253fcbf41d12b7

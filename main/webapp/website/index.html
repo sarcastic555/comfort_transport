@@ -23,7 +23,6 @@
     
       function initialize() {
         
-        
         var latlng = new google.maps.LatLng(35.680865,139.767036);
         var opts = {
           zoom: 14,
@@ -53,65 +52,48 @@
         infowindow.close();
       }
 
-      function toShinbashi() {
-        clearTimeout(timeout_id)
-        infowindow.close();
-        marker.setVisible(false);
-        map.panTo(new google.maps.LatLng(35.666397,139.758153));
-        var m_latlng = new google.maps.LatLng(35.666397,139.758153);;
-        marker = new google.maps.Marker({
-          position: m_latlng
-        });
-        marker.setMap(map);
-      }
-
-      function toShinagawa() {
-        clearTimeout(timeout_id)
-        infowindow.close();
-        marker.setVisible(false);
-        map.panTo(new google.maps.LatLng(35.629867,139.74015));
-        var m_latlng = new google.maps.LatLng(35.629867,139.74015);
-        infowindow = new google.maps.InfoWindow({
-          content: '品川駅',
-          position: m_latlng
-        });
-        infowindow.open(map);
-      }
-
-      function toTokyo() {
-        infowindow.close();
-        marker.setVisible(false);
-
-        if('lat' in toTokyo){
-          toTokyo.lat = toTokyo.lat + 0.0005;
-          toTokyo.lng = toTokyo.lng + 0.0005;  
-        }else{
-          toTokyo.lat = 35.680865;
-          toTokyo.lng = 139.767036
+      function PlotBusStop(url, icon_file){
+        console.log(url)
+　　　　var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function () {
+          if (xmlhttp.readyState == 4) {
+            if (xmlhttp.status == 200) {
+              var data = JSON.parse(xmlhttp.responseText);
+              console.log(data.length)
+              for (step = 0;step<data.length;step++) {
+                console.log(data[step].lat)
+                var m_latlng = new google.maps.LatLng(data[step].lat,data[step].lon);
+                marker = new google.maps.Marker({
+                  position: m_latlng,
+                  title: url,
+                  icon: {
+                      url: "http://unno.jpn.org/gmap/icons/"+icon_file
+                  }
+                });
+                marker.setMap(map);
+              }
+            }
+          }
         }
-        $a = 1;
-        
-        map.panTo(new google.maps.LatLng(35.680865,139.767036));
-        var m_latlng = new google.maps.LatLng(toTokyo.lat, toTokyo.lng);
-        var image = './icon.png';
-        marker = new google.maps.Marker({
-          position: m_latlng,
-          icon: image
-        });
-        marker.setMap(map);
-        timeout_id = setTimeout("toTokyo()", 1000);
-        
+        xmlhttp.open("GET",url);
+        xmlhttp.send();
+      }
+
+
+      function toTest() {
+        clearTimeout(timeout_id)
+        infowindow.close();
+        marker.setVisible(false);
+        map.panTo(new google.maps.LatLng(35.653697,139.726017));  
+
+        PlotBusStop("data0.json", "blue-dot.png")
+        PlotBusStop("data1.json", "red-dot.png")
       }
 
       function toCurrent() {
         function success(position) {
           marker.setVisible(false);
-          map.panTo(new google.maps.LatLng(35.680865,139.767036));
-          var m_latlng = new google.maps.LatLng(35.680865,139.767036);
-          marker = new google.maps.Marker({
-            position: m_latlng
-          });
-          marker.setMap(map);
+          map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
         };
         function error(err){
           switch(err.code) {
@@ -138,15 +120,16 @@
           output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
           return;
         }
+
+        // バス停座標を地図上にマーカー表示
+        PlotBusStop("data0.json", "blue-dot.png")
+        PlotBusStop("data1.json", "red-dot.png")
       }
 
     </script>
 
     <form>
     <p>
-    <input type="button" id="tokyo" value="東京" onclick="toTokyo()" />
-    <input type="button" id="shinbashi" value="新橋" onclick="toShinbashi()" />
-    <input type="button" id="shinagawa" value="品川" onclick="toShinagawa()" />
     <input type="button" id="current" value="現在位置" onclick="toCurrent()" />
     </p>
     </form>

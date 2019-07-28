@@ -52,6 +52,15 @@
         infowindow.close();
       }
 
+      function hex(s) {
+        var result="";
+        for(var i=0;i<s.length;++i){
+          var h = ("0"+s.charCodeAt(i).toString(16)).substr(-2);
+          result += h;
+        }
+        return result;
+      }
+
       function PlotBusStop(url, icon_file){
         console.log(url)
 　　　　var xmlhttp = new XMLHttpRequest();
@@ -63,11 +72,16 @@
               for (step = 0;step<data.length;step++) {
                 console.log(data[step].lat)
                 var m_latlng = new google.maps.LatLng(data[step].lat,data[step].lon);
+                marker_url = getMarker(hex(data[step].routepattern)%8)
+                console.log("print color")
+                console.log(hex(data[step].routepattern)%8)
+                console.log(marker_url)
                 marker = new google.maps.Marker({
                   position: m_latlng,
                   title: url,
                   icon: {
-                      url: "http://unno.jpn.org/gmap/icons/"+icon_file
+                      url: marker_url
+//                      url: "http://unno.jpn.org/gmap/icons/"+icon_file
                   }
                 });
                 marker.setMap(map);
@@ -79,18 +93,43 @@
         xmlhttp.send();
       }
 
+      function getMarker(id){
+        marker_file="red-dot.png"
+        if (id==0){
+          marker_file="red-dot.png"
+        } else if (id==1){
+          marker_file="blue-dot.png"
+        } else if (id==2){
+          marker_file="green-dot.png"
+        } else if (id==3){
+          marker_file="ltblue-dot.png"
+        } else if (id==4){
+          marker_file="yellow-dot.png"
+        } else if (id==5){
+          marker_file="purple-dot.png"
+        } else if (id==6){
+          marker_file="pink-dot.png"
+        } else if (id==7){
+          marker_file="orange-dot.png"
+        }
+        return "http://unno.jpn.org/gmap/icons/"+marker_file
+      }
 
       function toTest() {
         clearTimeout(timeout_id)
         infowindow.close();
         marker.setVisible(false);
         map.panTo(new google.maps.LatLng(35.653697,139.726017));  
-
+						     
         PlotBusStop("data0.json", "blue-dot.png")
         PlotBusStop("data1.json", "red-dot.png")
       }
 
       function toCurrent() {
+        console.log("abs")
+        console.log(hex("abc"))
+        console.log(hex("abc")%9)
+
         function success(position) {
           marker.setVisible(false);
           map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));

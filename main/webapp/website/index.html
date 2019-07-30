@@ -17,13 +17,15 @@
 
     <script type="text/javascript">
       var map;
-      var marker;
-      var inforwindow;
-      var timeout_id = null;
+      var load_location_id = null;
+      var bus_data_file = new XMLHttpRequest();
+      var buses;
+      var markers;
+      var done_first_load = false;
+      var last_update_sec;
+
     
-      function initialize() {
-        
-        
+      function initialize() { 
         var latlng = new google.maps.LatLng(35.680865,139.767036);
         var opts = {
           zoom: 14,
@@ -38,80 +40,93 @@
           mapdiv.style.height = '100%';
         }
         map = new google.maps.Map(mapdiv, opts);
-
-        //map = new google.maps.Map(document.getElementById("map_canvas"), opts);
-        marker = new google.maps.Marker({
-          position: latlng
-        });
-        marker.setMap(map)
-        marker.setVisible(false);
-
-        
-        infowindow = new google.maps.InfoWindow({
-        });
-        infowindow.open(map);
-        infowindow.close();
       }
 
-      function toShinbashi() {
-        clearTimeout(timeout_id)
-        infowindow.close();
-        marker.setVisible(false);
-        map.panTo(new google.maps.LatLng(35.666397,139.758153));
-        var m_latlng = new google.maps.LatLng(35.666397,139.758153);;
-        marker = new google.maps.Marker({
+      function Bus(id, lat, lng, date){
+        this.id = id;
+        this.lat = lat;
+        this.lng = lng;
+        this.data = date;
+      }
+
+
+      function get_marker(bus){
+        var m_latlng = new google.maps.LatLng(bus.lat, bus.lng);
+        var marker = new google.maps.Marker({
           position: m_latlng
         });
-        marker.setMap(map);
+        return marker
       }
 
-      function toShinagawa() {
-        clearTimeout(timeout_id)
-        infowindow.close();
-        marker.setVisible(false);
-        map.panTo(new google.maps.LatLng(35.629867,139.74015));
-        var m_latlng = new google.maps.LatLng(35.629867,139.74015);
-        infowindow = new google.maps.InfoWindow({
-          content: '品川駅',
-          position: m_latlng
-        });
-        infowindow.open(map);
-      }
-
-      function toTokyo() {
-        infowindow.close();
-        marker.setVisible(false);
-
-        if('lat' in toTokyo){
-          toTokyo.lat = toTokyo.lat + 0.0005;
-          toTokyo.lng = toTokyo.lng + 0.0005;  
-        }else{
-          toTokyo.lat = 35.680865;
-          toTokyo.lng = 139.767036
+      function pin_bus_locations(buses){
+        for(var i=0; i<buses.length; i++){    
+          markers[i] = get_marker(buses[i]);
+          markers[i].setMap(map);
         }
-        $a = 1;
+      }
+      
+      bus_data_file.onload = function () {
         
-        map.panTo(new google.maps.LatLng(35.680865,139.767036));
-        var m_latlng = new google.maps.LatLng(toTokyo.lat, toTokyo.lng);
-        var image = './icon.png';
-        marker = new google.maps.Marker({
-          position: m_latlng,
-          icon: image
-        });
-        marker.setMap(map);
-        timeout_id = setTimeout("toTokyo()", 1000);
-        
+        var text = bus_data_file.responseText
+        var bus_data = JSON.parse(text);
+        if(!done_first_load){
+          buses = Array(bus_data.length);
+          markers = Array(buses.length);
+          for(var i=0; i<buses.length; i++){
+            var id = bus_data[i]["@id"];
+            var lat = bus_data[i]["geo:lat"];
+            var lng = bus_data[i]["geo:long"];
+            var date = bus_data[i]["dc:date"];
+            buses[i] = new Bus(id, lat, lng, date);
+          }
+          var now = new Date();
+          last_update_sec = now.getSeconds();
+        }else{
+          for(var i=0; i<bus_data.length; i++){
+            var id = bus_data[i]["@id"];
+            for(var j=0; j<buses.length; j++){
+              if(id == buses[j].id){
+                markers[j].setVisible(false);
+                var lat = bus_data[i]["geo:lat"];
+                var lng = bus_data[i]["geo:long"];
+                if(buses[j].lat != lat && buses[j].lng != lng){
+                  var now = new Date();
+                  last_update_sec = now.getSeconds();
+                  buses[j].lat = lat;
+                  buses[j].lng = lng;
+                }
+                break;
+              }
+            }
+          }
+        }
+        pin_bus_locations(buses);
+        done_first_load = true;
+      }
+      
+      function load_location(){
+        bus_data_file.open("GET", "https://api-tokyochallenge.odpt.org/api/v4/odpt:Bus?odpt:operator=odpt.Operator:SeibuBus&acl:consumerKey=2deef49e96744c2566cca5bb289318cd28490a662d82b8e62a071d32afe3fc3c");
+        bus_data_file.send();
       }
 
+      load_location();
+      load_location_id = setInterval("load_location()", 30000);
+      update_time_id = setInterval("update_time()", 1000);
+
+
+      function update_time(){
+        var now = new Date();
+        var sec = (59 + now.getSeconds() - last_update_sec) % 60;
+        var text = "最終更新から"+ sec +"秒";
+        target = document.getElementById('time');
+        target.innerHTML = text;
+      }
+      
+
+      
       function toCurrent() {
         function success(position) {
-          marker.setVisible(false);
-          map.panTo(new google.maps.LatLng(35.680865,139.767036));
-          var m_latlng = new google.maps.LatLng(35.680865,139.767036);
-          marker = new google.maps.Marker({
-            position: m_latlng
-          });
-          marker.setMap(map);
+          map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
         };
         function error(err){
           switch(err.code) {
@@ -144,11 +159,10 @@
 
     <form>
     <p>
-    <input type="button" id="tokyo" value="東京" onclick="toTokyo()" />
-    <input type="button" id="shinbashi" value="新橋" onclick="toShinbashi()" />
-    <input type="button" id="shinagawa" value="品川" onclick="toShinagawa()" />
     <input type="button" id="current" value="現在位置" onclick="toCurrent()" />
+
     </p>
+    <p id="time"></p>
     </form>
   </body>
 </html>

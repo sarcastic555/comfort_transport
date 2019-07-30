@@ -24,7 +24,6 @@
       var done_first_load = false;
       var last_update_sec;
 
-    
       function initialize() { 
         var latlng = new google.maps.LatLng(35.680865,139.767036);
         var opts = {
@@ -48,7 +47,6 @@
         this.lng = lng;
         this.data = date;
       }
-
 
       function get_marker(bus){
         var m_latlng = new google.maps.LatLng(bus.lat, bus.lng);
@@ -102,17 +100,73 @@
         }
         pin_bus_locations(buses);
         done_first_load = true;
+
+      function hex(s) {
+        var result="";
+        for(var i=0;i<s.length;++i){
+          var h = ("0"+s.charCodeAt(i).toString(16)).substr(-2);
+          result += h;
+        }
+        return result;
+      }
+
+      function PlotBusStop(url, icon_file){
+        console.log(url)
+　　　　var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function () {
+          if (xmlhttp.readyState == 4) {
+            if (xmlhttp.status == 200) {
+              var data = JSON.parse(xmlhttp.responseText);
+              console.log(data.length)
+              for (step = 0;step<data.length;step++) {
+                console.log(data[step].lat)
+                var m_latlng = new google.maps.LatLng(data[step].lat,data[step].lon);
+                marker_url = getMarker(hex(data[step].routepattern)%8)
+                console.log("print color")
+                console.log(hex(data[step].routepattern)%8)
+                console.log(marker_url)
+                marker = new google.maps.Marker({
+                  position: m_latlng,
+                  title: url,
+                  icon: {
+                      url: marker_url
+                  }
+                });
+                marker.setMap(map);
+              }
+            }
+          }
+        }
+        xmlhttp.open("GET",url);
+        xmlhttp.send();
+      }
+
+      function getMarker(id){
+        marker_file="red-dot.png"
+        if (id==0){
+          marker_file="red-dot.png"
+        } else if (id==1){
+          marker_file="blue-dot.png"
+        } else if (id==2){
+          marker_file="green-dot.png"
+        } else if (id==3){
+          marker_file="ltblue-dot.png"
+        } else if (id==4){
+          marker_file="yellow-dot.png"
+        } else if (id==5){
+          marker_file="purple-dot.png"
+        } else if (id==6){
+          marker_file="pink-dot.png"
+        } else if (id==7){
+          marker_file="orange-dot.png"
+        }
+        return "http://unno.jpn.org/gmap/icons/"+marker_file
       }
       
       function load_location(){
         bus_data_file.open("GET", "https://api-tokyochallenge.odpt.org/api/v4/odpt:Bus?odpt:operator=odpt.Operator:SeibuBus&acl:consumerKey=2deef49e96744c2566cca5bb289318cd28490a662d82b8e62a071d32afe3fc3c");
         bus_data_file.send();
       }
-
-      load_location();
-      load_location_id = setInterval("load_location()", 30000);
-      update_time_id = setInterval("update_time()", 1000);
-
 
       function update_time(){
         var now = new Date();
@@ -122,10 +176,13 @@
         target.innerHTML = text;
       }
       
-
-      
       function toCurrent() {
+        console.log("abs")
+        console.log(hex("abc"))
+        console.log(hex("abc")%9)
+
         function success(position) {
+          marker.setVisible(false);
           map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
         };
         function error(err){
@@ -153,6 +210,17 @@
           output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
           return;
         }
+        
+        // 30秒ごとにバス位置座標データを読み込む
+        load_location();
+        load_location_id = setInterval("load_location()", 30000);
+        
+        // 1秒ごとに最終更新時間の表示を更新
+        update_time_id = setInterval("update_time()", 1000);
+
+        // バス停座標を地図上にマーカー表示
+        PlotBusStop("data0.json", "blue-dot.png")
+        PlotBusStop("data1.json", "red-dot.png")
       }
 
     </script>

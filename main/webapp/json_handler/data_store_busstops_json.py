@@ -18,12 +18,13 @@ def readout_json_bus_stops(company):
         if( f(busstop["geo:lat"]) ):
             continue
         dict_bus_stop = {}
-        for component in ["odpt:note", "@id", "geo:lat", "geo:long"]:
+        for component in ["odpt:kana", "@id", "geo:lat", "geo:long", "odpt:busroutePattern"]:
             dict_bus_stop[component] = busstop[component]        
         list_bus_stops.append(dict_bus_stop)
     print(len(list_bus_stops))
     file_name = open('./coord_busstops_' + company + '.json', 'w')
     json.dump(list_bus_stops, file_name)
 
-
-readout_json_bus_stops("Toei")
+companies = ["Toei", "SeibuBus", "NishiTokyoBus", "KokusaiKogyoBus", "KantoBus", "TokyuBus"]
+for company in companies:
+    readout_json_bus_stops(company)

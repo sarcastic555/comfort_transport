@@ -25,6 +25,12 @@ def readout_json_bus_stops(company):
     file_name = open('./coord_busstops_' + company + '.json', 'w')
     json.dump(list_bus_stops, file_name)
 
-companies = ["Toei", "SeibuBus", "NishiTokyoBus", "KokusaiKogyoBus", "KantoBus", "TokyuBus"]
-for company in companies:
-    readout_json_bus_stops(company)
+
+
+def main():
+    companies = ["Toei", "SeibuBus", "NishiTokyoBus", "KokusaiKogyoBus", "KantoBus", "TokyuBus"]
+    for company in companies:
+        readout_json_bus_stops(company)
+
+if __name__ == "__main__":
+    main()

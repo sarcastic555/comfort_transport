@@ -1,36 +1,43 @@
 [
     {
 	"name":"愛育クリニック前",
+        "routepattern":"B1",
 	"lat":35.653697,
 	"lon":139.726017
     },
     {
 	"name":"青戸車庫前",
+        "routepattern":"B1",
 	"lat":35.744742,
 	"lon":139.843722
     },
     {
 	"name":"青物横丁",
+        "routepattern":"B1",
 	"lat":35.609036,
 	"lon":139.741708
     },
     {
 	"name": "青山学院初等部前",
+        "routepattern":"B1",
 	"lat":35.657689,
 	"lon":139.710639
     },
     {
 	"name": "青山学院中等部前",
+        "routepattern":"D2",
 	"lat":35.659123,
 	"lon":139.713654
     },
     {
 	"name": "青山学院前",
+        "routepattern":"D2",
 	"lat":35.66185,
 	"lon":139.708604
     },
     {
 	"name": "青山斎場",
+        "routepattern":"D2",
 	"lat":35.667434,
 	"lon":139.724244
     }

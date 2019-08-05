@@ -39,14 +39,14 @@
           mapdiv.style.height = '100%';
         }
         map = new google.maps.Map(mapdiv, opts);
-      }
+      };
 
       function Bus(id, lat, lng, date){
         this.id = id;
         this.lat = lat;
         this.lng = lng;
         this.data = date;
-      }
+      };
 
       function get_marker(bus){
         var m_latlng = new google.maps.LatLng(bus.lat, bus.lng);
@@ -54,14 +54,14 @@
           position: m_latlng
         });
         return marker
-      }
+      };
 
       function pin_bus_locations(buses){
         for(var i=0; i<buses.length; i++){    
           markers[i] = get_marker(buses[i]);
           markers[i].setMap(map);
         }
-      }
+      };
       
       bus_data_file.onload = function () {
         
@@ -100,32 +100,37 @@
         }
         pin_bus_locations(buses);
         done_first_load = true;
-      }
+      };
 
       function hex(s) {
+        console.log("function hex(s)")
+        console.log(s)
         var result="";
         for(var i=0;i<s.length;++i){
           var h = ("0"+s.charCodeAt(i).toString(16)).substr(-2);
           result += h;
         }
         return result;
-      }
+      };
 
       function PlotBusStop(url, icon_file){
-        console.log(url)
+        console.log(url);
 　　　　var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function () {
           if (xmlhttp.readyState == 4) {
             if (xmlhttp.status == 200) {
               var data = JSON.parse(xmlhttp.responseText);
-              console.log(data.length)
+              console.log(data.length);
               for (step = 0;step<data.length;step++) {
-                console.log(data[step].lat)
+                console.log(data[step].lat);
+                console.log(data[step].lon);
                 var m_latlng = new google.maps.LatLng(data[step].lat,data[step].lon);
-                marker_url = getMarker(hex(data[step].routepattern)%8)
-                console.log("print color")
-                console.log(hex(data[step].routepattern)%8)
-                console.log(marker_url)
+                //console.log(hex(data[step].busroutePattern)%8);
+                //marker_url = getMarker(hex(data[step].busroutePattern)%8);
+                //marker_url = getMarker(hex("aho")%8);
+                marker_url = "http://unno.jpn.org/gmap/icons/blue-dot.png"
+                console.log("print color");
+                console.log(marker_url);
                 marker = new google.maps.Marker({
                   position: m_latlng,
                   title: url,
@@ -140,7 +145,7 @@
         }
         xmlhttp.open("GET",url);
         xmlhttp.send();
-      }
+      };
 
       function getMarker(id){
         marker_file="red-dot.png"
@@ -162,12 +167,12 @@
           marker_file="orange-dot.png"
         }
         return "http://unno.jpn.org/gmap/icons/"+marker_file
-      }
+      };
       
       function load_location(){
         bus_data_file.open("GET", "https://api-tokyochallenge.odpt.org/api/v4/odpt:Bus?odpt:operator=odpt.Operator:SeibuBus&acl:consumerKey=2deef49e96744c2566cca5bb289318cd28490a662d82b8e62a071d32afe3fc3c");
         bus_data_file.send();
-      }
+      };
 
       function update_time(){
         var now = new Date();
@@ -175,7 +180,7 @@
         var text = "最終更新から"+ sec +"秒";
         target = document.getElementById('time');
         target.innerHTML = text;
-      }
+      };
       
       function toCurrent() {
         console.log("abs")
@@ -183,7 +188,6 @@
         console.log(hex("abc")%9)
 
         function success(position) {
-          marker.setVisible(false);
           map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
         };
         function error(err){
@@ -217,19 +221,46 @@
         load_location_id = setInterval("load_location()", 30000);
         
         // 1秒ごとに最終更新時間の表示を更新
+        console.log("update map")
         update_time_id = setInterval("update_time()", 1000);
 
         // バス停座標を地図上にマーカー表示
-        PlotBusStop("data0.json", "blue-dot.png")
-        PlotBusStop("data1.json", "red-dot.png")
-      }
+        let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+        for(let i = 0; i < bus_company_list.length; i++) {
+          PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
+        }
+      };
 
+      function toTest() {
+        var map = new google.maps.Map(document.getElementById("map"), {
+          zoom : 10,
+          center: new google.maps.LatLng(35.7, 139.7),
+          mayTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+        var directionsService = new google.maps.DirectionsService;
+        var directionsRenderer = new google.maps.DirectionsRenderer;
+
+        // ルート検索を実行
+        directionsService.route({
+          origin: "東京駅",
+          destination: "新宿駅",
+          travelMode: google.maps.TravelMode.DRIVING
+          }, function(response, status) {
+            console.log(response);
+            if (status === google.maps.DirectionsStatus.OK) {
+              // ルート検索の結果を地図上に描画
+              directionsRenderer.setMap(map);
+              directionsRenderer.setDirections(response); 
+          }
+        });
+      };
     </script>
 
     <form>
     <p>
     <input type="button" id="current" value="現在位置" onclick="toCurrent()" />
-
+    <input type="button" id="current" value="Test" onclick="toTest()" />
     </p>
     <p id="time"></p>
     </form>

@@ -13,14 +13,14 @@
   <body onload="initialize()">
     <p>Comfort Transport Test</p>
 
-    <div id="map_canvas" style="width:500px; height:300px"></div>
+    <div id="map_canvas" style="width:700px; height:700px"></div>
 
     <script type="text/javascript">
       var map;
       var load_location_id = null;
       var bus_data_file = new XMLHttpRequest();
       var buses;
-      var markers;
+      var num_colors = 8;
       var done_first_load = false;
       var last_update_sec;
 
@@ -46,6 +46,20 @@
         this.lat = lat;
         this.lng = lng;
         this.data = date;
+
+        var m_latlng = new google.maps.LatLng(lat, lng);
+        hash_key = Math.ceil(lat * 1000) % num_colors;
+        var img_url = './bus_img/' + hash_key.toString(10) + '.png';
+        console.log(img_url);
+        var image = {
+          url : img_url,
+          scaledSize : new google.maps.Size(48, 48)
+        };
+        this.marker = new google.maps.Marker({
+          position: m_latlng,
+          icon:image
+        });
+        console.log(this.marker)
       };
 
       function get_marker(bus){
@@ -56,10 +70,15 @@
         return marker
       };
 
+      function bus_move(bus, lat, lng){
+        bus.lat = lat;
+        bus.lng = lng;
+        bus.marker.setPosition(new google.maps.LatLng(lat, lng));
+      }
+
       function pin_bus_locations(buses){
         for(var i=0; i<buses.length; i++){    
-          markers[i] = get_marker(buses[i]);
-          markers[i].setMap(map);
+          buses[i].marker.setMap(map);
         }
       };
       
@@ -69,7 +88,6 @@
         var bus_data = JSON.parse(text);
         if(!done_first_load){
           buses = Array(bus_data.length);
-          markers = Array(buses.length);
           for(var i=0; i<buses.length; i++){
             var id = bus_data[i]["@id"];
             var lat = bus_data[i]["geo:lat"];
@@ -84,14 +102,13 @@
             var id = bus_data[i]["@id"];
             for(var j=0; j<buses.length; j++){
               if(id == buses[j].id){
-                markers[j].setVisible(false);
+                //buses[i].marker.setVisible(false);
                 var lat = bus_data[i]["geo:lat"];
                 var lng = bus_data[i]["geo:long"];
                 if(buses[j].lat != lat && buses[j].lng != lng){
                   var now = new Date();
                   last_update_sec = now.getSeconds();
-                  buses[j].lat = lat;
-                  buses[j].lng = lng;
+                  bus_move(buses[i], lat, lng);
                 }
                 break;
               }
@@ -171,6 +188,7 @@
       
       function load_location(){
         bus_data_file.open("GET", "https://api-tokyochallenge.odpt.org/api/v4/odpt:Bus?odpt:operator=odpt.Operator:SeibuBus&acl:consumerKey=2deef49e96744c2566cca5bb289318cd28490a662d82b8e62a071d32afe3fc3c");
+        //bus_data_file.open("GET", "https://api-tokyochallenge.odpt.org/api/v4/odpt:Bus?odpt:operator=odpt.Operator:Toei&acl:consumerKey=2deef49e96744c2566cca5bb289318cd28490a662d82b8e62a071d32afe3fc3c");
         bus_data_file.send();
       };
 
@@ -188,6 +206,10 @@
         console.log(hex("abc")%9)
 
         function success(position) {
+<<<<<<< HEAD
+=======
+          //marker.setVisible(false);
+>>>>>>> 8eded68e244032ed189dfa6b2331d845411d7413
           map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
         };
         function error(err){

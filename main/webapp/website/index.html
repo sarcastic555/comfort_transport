@@ -41,16 +41,16 @@
         map = new google.maps.Map(mapdiv, opts);
       };
 
-      function Bus(id, lat, lng, date){
+      function Bus(id, lat, lng, date, number){
         this.id = id;
         this.lat = lat;
         this.lng = lng;
         this.data = date;
 
         var m_latlng = new google.maps.LatLng(lat, lng);
-        hash_key = Math.ceil(lat * 1000) % num_colors;
+        hash_key = number % num_colors;
         var img_url = './bus_img/' + hash_key.toString(10) + '.png';
-        console.log(img_url);
+        console.log(id);
         var image = {
           url : img_url,
           scaledSize : new google.maps.Size(48, 48)
@@ -93,7 +93,8 @@
             var lat = bus_data[i]["geo:lat"];
             var lng = bus_data[i]["geo:long"];
             var date = bus_data[i]["dc:date"];
-            buses[i] = new Bus(id, lat, lng, date);
+            var number = Number(bus_data[i]["odpt:busNumber"]);
+            buses[i] = new Bus(id, lat, lng, date, number);
           }
           var now = new Date();
           last_update_sec = now.getSeconds();

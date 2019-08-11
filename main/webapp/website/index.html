@@ -50,7 +50,7 @@
         var m_latlng = new google.maps.LatLng(lat, lng);
         hash_key = number % num_colors;
         var img_url = './bus_img/' + hash_key.toString(10) + '.png';
-        console.log(id);
+//        console.log(id);
         var image = {
           url : img_url,
           scaledSize : new google.maps.Size(48, 48)
@@ -59,7 +59,7 @@
           position: m_latlng,
           icon:image
         });
-        console.log(this.marker)
+//        console.log(this.marker)
       };
 
       function get_marker(bus){
@@ -109,6 +109,8 @@
                 if(buses[j].lat != lat && buses[j].lng != lng){
                   var now = new Date();
                   last_update_sec = now.getSeconds();
+//                  console.log(lat);
+//                  console.log(lng);
                   bus_move(buses[i], lat, lng);
                 }
                 break;
@@ -138,17 +140,17 @@
           if (xmlhttp.readyState == 4) {
             if (xmlhttp.status == 200) {
               var data = JSON.parse(xmlhttp.responseText);
-              console.log(data.length);
+              //console.log(data.length);
               for (step = 0;step<data.length;step++) {
-                console.log(data[step].lat);
-                console.log(data[step].lon);
+                //console.log(data[step].lat);
+                //console.log(data[step].lon);
                 var m_latlng = new google.maps.LatLng(data[step].lat,data[step].lon);
                 //console.log(hex(data[step].busroutePattern)%8);
                 //marker_url = getMarker(hex(data[step].busroutePattern)%8);
                 //marker_url = getMarker(hex("aho")%8);
                 marker_url = "http://unno.jpn.org/gmap/icons/blue-dot.png"
-                console.log("print color");
-                console.log(marker_url);
+                //console.log("print color");
+                //console.log(marker_url);
                 marker = new google.maps.Marker({
                   position: m_latlng,
                   title: url,
@@ -248,32 +250,32 @@
         for(let i = 0; i < bus_company_list.length; i++) {
           PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
         }
-      };
 
-      function toTest() {
-        var map = new google.maps.Map(document.getElementById("map"), {
-          zoom : 10,
-          center: new google.maps.LatLng(35.7, 139.7),
-          mayTypeId: google.maps.MapTypeId.ROADMAP
-        });
-
-        var directionsService = new google.maps.DirectionsService;
-        var directionsRenderer = new google.maps.DirectionsRenderer;
-
-        // ルート検索を実行
-        directionsService.route({
-          origin: "東京駅",
-          destination: "新宿駅",
-          travelMode: google.maps.TravelMode.DRIVING
-          }, function(response, status) {
-            console.log(response);
-            if (status === google.maps.DirectionsStatus.OK) {
-              // ルート検索の結果を地図上に描画
-              directionsRenderer.setMap(map);
-              directionsRenderer.setDirections(response); 
+        // バスルート表示
+        var directionsService = new google.maps.DirectionsService();
+        var directionsDisplay = new google.maps.DirectionsRenderer();
+        var place1 = new google.maps.LatLng(35.681565, 139.920046);
+        var place2 = new google.maps.LatLng(35.683691, 139.908180);
+        directionsDisplay.setMap(map);
+        var route_request = {
+//          origin: place1,
+//          origin: 'Shinjuku',
+          origin: {lat: 35.681565, lng: 139.920046},
+     //     destination: place2,
+          destination: {lat: 35.683691, lng: 139.908180},
+//          destination: 'Shibuya',
+          travelMode: 'DRIVING'
+        };
+        directionsService.route(route_request, function(route_result, status) {
+          if (status == 'OK') {
+            directionsDisplay.setDirections(route_result);
+          } else {
+            console.log("direction service error")
           }
         });
+
       };
+
     </script>
 
     <form>

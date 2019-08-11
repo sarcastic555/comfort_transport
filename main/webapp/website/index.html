@@ -24,6 +24,25 @@
       var done_first_load = false;
       var last_update_sec;
 
+//      var bus_location_example = [
+//        {lat: 35.794675, lng: 139.540672},
+//        {lat: 35.793030, lng: 139.539191},
+//        {lat: 35.791072, lng: 139.537281},
+//        {lat: 35.789305, lng: 139.537935},
+//        {lat: 35.788939, lng: 139.537044},
+//        {lat: 35.787660, lng: 139.534029},
+//        {lat: 35.786294, lng: 139.530531}
+//      ]
+      var bus_location_example = [
+        { location: new google.maps.LatLng(35.794675, 139.540672) },
+        { location: new google.maps.LatLng(35.793030, 139.539191) },
+        { location: new google.maps.LatLng(35.791072, 139.537281) },
+        { location: new google.maps.LatLng(35.789305, 139.537935) },
+        { location: new google.maps.LatLng(35.788939, 139.537044) },
+        { location: new google.maps.LatLng(35.787660, 139.534029) },
+        { location: new google.maps.LatLng(35.786294, 139.530531) },
+      ]
+
       function initialize() { 
         var latlng = new google.maps.LatLng(35.680865,139.767036);
         var opts = {
@@ -207,6 +226,48 @@
         console.log("abs")
         console.log(hex("abc"))
         console.log(hex("abc")%9)
+        
+        // 30秒ごとにバス位置座標データを読み込む
+        load_location();
+        load_location_id = setInterval("load_location()", 30000);
+        
+        // 1秒ごとに最終更新時間の表示を更新
+        console.log("update map")
+        update_time_id = setInterval("update_time()", 1000);
+
+        // バス停座標を地図上にマーカー表示
+        let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+        for(let i = 0; i < bus_company_list.length; i++) {
+          PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
+        }
+
+        // バスルート表示
+        var directionsService = new google.maps.DirectionsService();
+        var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
+
+        directionsDisplay.setMap(map);
+        var route_request = {
+//           origin: { location: new google.maps.LatLng(35.681565,139.920046) },
+          origin: bus_location_example[0],
+//           destination: { location: new google.maps.LatLng(35.68369,139.908180) },
+          destination: bus_location_example[bus_location_example.length-1],
+          waypoints: bus_location_example.slice(1, bus_location_example.length-1),
+//          waypoints: [
+//            { location: new google.maps.LatLng(35.684961,139.930923) },
+//            { location: new google.maps.LatLng(35.685,139.958180) },
+//            {lat: 35.684961, lng: 139.930923},
+//            {lat: 35.685, lng: 139.958180},
+//            {lat: 35.686691, lng: 139.908180},
+//          ],
+          travelMode: 'DRIVING'
+        };
+        directionsService.route(route_request, function(route_result, status) {
+          if (status == 'OK') {
+            directionsDisplay.setDirections(route_result);
+          } else {
+            console.log("direction service error")
+          }
+        });
 
         function success(position) {
           map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
@@ -236,43 +297,6 @@
           output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
           return;
         }
-        
-        // 30秒ごとにバス位置座標データを読み込む
-        load_location();
-        load_location_id = setInterval("load_location()", 30000);
-        
-        // 1秒ごとに最終更新時間の表示を更新
-        console.log("update map")
-        update_time_id = setInterval("update_time()", 1000);
-
-        // バス停座標を地図上にマーカー表示
-        let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
-        for(let i = 0; i < bus_company_list.length; i++) {
-          PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
-        }
-
-        // バスルート表示
-        var directionsService = new google.maps.DirectionsService();
-        var directionsDisplay = new google.maps.DirectionsRenderer();
-        var place1 = new google.maps.LatLng(35.681565, 139.920046);
-        var place2 = new google.maps.LatLng(35.683691, 139.908180);
-        directionsDisplay.setMap(map);
-        var route_request = {
-//          origin: place1,
-//          origin: 'Shinjuku',
-          origin: {lat: 35.681565, lng: 139.920046},
-     //     destination: place2,
-          destination: {lat: 35.683691, lng: 139.908180},
-//          destination: 'Shibuya',
-          travelMode: 'DRIVING'
-        };
-        directionsService.route(route_request, function(route_result, status) {
-          if (status == 'OK') {
-            directionsDisplay.setDirections(route_result);
-          } else {
-            console.log("direction service error")
-          }
-        });
 
       };
 

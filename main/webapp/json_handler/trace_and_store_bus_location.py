@@ -23,14 +23,18 @@ key_convert_list = {
 
 def classify_bus_location_by_bus_number(company, token, output_dir, save_key_list):
     bus_location_info_list = requests.get(HTTPS + company + KEY + token).json()
+    bus_pattern_list = []
+
     for bus_location_info in bus_location_info_list:
         bus_number = int(bus_location_info["odpt:busNumber"])
-        save_param_dict = {}
-        for save_key in save_key_list:
-            save_param_dict[key_convert_list[save_key]] = bus_location_info[save_key]
-        print(save_param_dict)
-        output_file_name = open('%s/bus_location_%04d.json'%(output_dir, bus_number), 'a')
-        json.dump(save_param_dict, output_file_name)
+        bus_pattern = bus_location_info["odpt:busroutePattern"].lstrip("odpt.BusroutePattern:%s." % company)
+        if not bus_pattern in bus_pattern_list:
+            save_param_dict = {}
+            for save_key in save_key_list:
+                save_param_dict[key_convert_list[save_key]] = bus_location_info[save_key]
+            output_file_name = open('%s/bus_location_%s.json' % (output_dir, bus_pattern), 'a')
+            json.dump(save_param_dict, output_file_name)
+            bus_pattern_list.append(bus_pattern)
     return
 
 if __name__ == "__main__":

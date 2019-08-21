@@ -41,15 +41,14 @@
         map = new google.maps.Map(mapdiv, opts);
       }
 
-      function Bus(id, lat, lng, date, number){
-        this.id = id;
+      function Bus(lat, lng, date, number){
         this.lat = lat;
         this.lng = lng;
         this.data = date;
+        this.number = number;
         var m_latlng = new google.maps.LatLng(lat, lng);
         hash_key = number % num_colors;
         var img_url = './bus_img/' + hash_key.toString(10) + '.png';
-        console.log(id);
         var image = {
           url : img_url,
           scaledSize : new google.maps.Size(48, 48)
@@ -80,27 +79,25 @@
         if(!done_first_load){
           buses = Array(bus_data.length);
           for(var i=0; i<buses.length; i++){
-            var id = bus_data[i]["@id"];
             var lat = bus_data[i]["geo:lat"];
             var lng = bus_data[i]["geo:long"];
             var date = bus_data[i]["dc:date"];
             var number = Number(bus_data[i]["odpt:busNumber"]);
-            buses[i] = new Bus(id, lat, lng, date, number);
+            buses[i] = new Bus(lat, lng, date, number);
           }
           var now = new Date();
           last_update_sec = now.getSeconds();
         }else{
           for(var i=0; i<bus_data.length; i++){
-            var id = bus_data[i]["@id"];
+            var number = Number(bus_data[i]["odpt:busNumber"]);
             for(var j=0; j<buses.length; j++){
-              if(id == buses[j].id){
-                //buses[i].marker.setVisible(false);
+              if(buses[j].number == number){
                 var lat = bus_data[i]["geo:lat"];
                 var lng = bus_data[i]["geo:long"];
                 if(buses[j].lat != lat && buses[j].lng != lng){
                   var now = new Date();
                   last_update_sec = now.getSeconds();
-                  bus_move(buses[i], lat, lng);
+                  bus_move(buses[j], lat, lng);
                 }
                 break;
               }

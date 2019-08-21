@@ -19,7 +19,8 @@
       var map;
       var load_location_id = null;
       var bus_data_file = new XMLHttpRequest();
-      var buses;
+      var buses0;
+      var buses1;
       var num_colors = 8;
       var done_first_load = false;
       var last_update_sec;
@@ -60,16 +61,25 @@
         map = new google.maps.Map(mapdiv, opts);
       };
 
-      function Bus(id, lat, lng, date, number){
-        this.id = id;
+      function buses_copy(){
+        if(!buses1){
+          return;
+        }
+        num_buses = buses1.length;
+        buses0 = Array(num_buses);
+        for(var i=0; i<num_buses; i++){
+          buses0[i] = Bus(buses1[i].lat, buses1[i].lng, buses1[i].date, buses1[i].number);
+        }
+      }
+
+      function Bus(lat, lng, date, number){
         this.lat = lat;
         this.lng = lng;
-        this.data = date;
-
+        this.date = date;
+        this.number = number;
         var m_latlng = new google.maps.LatLng(lat, lng);
         hash_key = number % num_colors;
         var img_url = './bus_img/' + hash_key.toString(10) + '.png';
-//        console.log(id);
         var image = {
           url : img_url,
           scaledSize : new google.maps.Size(48, 48)
@@ -78,7 +88,6 @@
           position: m_latlng,
           icon:image
         });
-//        console.log(this.marker)
       };
 
       function get_marker(bus){
@@ -95,7 +104,19 @@
         bus.marker.setPosition(new google.maps.LatLng(lat, lng));
       }
 
-      function pin_bus_locations(buses){
+      function delete_bus_markers(buses){
+        if(!buses){
+          return;
+        }
+        for(var i=0; i<buses.length; i++){    
+          buses[i].marker.setVisible(false);
+        }
+      }
+
+      function pin_bus_markers(buses){
+        if(!buses){
+          return;
+        }
         for(var i=0; i<buses.length; i++){    
           buses[i].marker.setMap(map);
         }
@@ -105,40 +126,21 @@
         
         var text = bus_data_file.responseText
         var bus_data = JSON.parse(text);
-        if(!done_first_load){
-          buses = Array(bus_data.length);
-          for(var i=0; i<buses.length; i++){
-            var id = bus_data[i]["@id"];
-            var lat = bus_data[i]["geo:lat"];
-            var lng = bus_data[i]["geo:long"];
-            var date = bus_data[i]["dc:date"];
-            var number = Number(bus_data[i]["odpt:busNumber"]);
-            buses[i] = new Bus(id, lat, lng, date, number);
-          }
-          var now = new Date();
-          last_update_sec = now.getSeconds();
-        }else{
-          for(var i=0; i<bus_data.length; i++){
-            var id = bus_data[i]["@id"];
-            for(var j=0; j<buses.length; j++){
-              if(id == buses[j].id){
-                //buses[i].marker.setVisible(false);
-                var lat = bus_data[i]["geo:lat"];
-                var lng = bus_data[i]["geo:long"];
-                if(buses[j].lat != lat && buses[j].lng != lng){
-                  var now = new Date();
-                  last_update_sec = now.getSeconds();
-//                  console.log(lat);
-//                  console.log(lng);
-                  bus_move(buses[i], lat, lng);
-                }
-                break;
-              }
-            }
-          }
+        delete_bus_markers(buses1);
+        buses_copy();
+        buses1 = Array(bus_data.length);
+        for(var i=0; i<buses1.length; i++){
+          var lat = bus_data[i]["geo:lat"];
+          var lng = bus_data[i]["geo:long"];
+          var date = bus_data[i]["dc:date"];
+          var number = Number(bus_data[i]["odpt:busNumber"]);
+          buses1[i] = new Bus(lat, lng, date, number);
+          bus_move(buses1[i], lat, lng);
         }
-        pin_bus_locations(buses);
-        done_first_load = true;
+
+        var now = new Date();
+        last_update_sec = now.getSeconds();
+        pin_bus_markers(buses1);
       };
 
       function hex(s) {

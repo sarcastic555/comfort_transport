@@ -20,3 +20,4 @@ for i, color in enumerate(colors):
     img[:,:,2] = color[2]
     pil_img = Image.fromarray(img)
     pil_img.save('%d.png'%i)
+    

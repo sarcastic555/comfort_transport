@@ -241,6 +241,42 @@
           PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
         }
 
+        bus_location_list = []
+//        bus_location_list.push({ location: new google.maps.LatLng(35.786294, 139.530531) })
+//        bus_location_list.push({ location: new google.maps.LatLng(35.786294, 139.530531) })
+//        bus_location_list.push({ location: new google.maps.LatLng(35.794675, 139.540672) })
+//        bus_location_list.push({ location: new google.maps.LatLng(35.734675, 139.500672) })
+//        console.log(bus_location_list.length)
+
+        // バスロケーション情報の蓄積を読み込む
+        var ReadBusLocationAccumulation = function(file_path){
+          console.log(file_path);
+　　  　　var xmlhttp = new XMLHttpRequest();
+          xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4) {
+              if (xmlhttp.status == 200) {
+                var data = JSON.parse(xmlhttp.responseText);
+                console.log("succeed")
+                console.log(data.length)
+                for (step = 0;step<data.length;step++) {
+                  console.log(data[step].lat)
+                  console.log(data[step].long)
+                  bus_location_list.push({ location: new google.maps.LatLng(data[step].lat, data[step].long) })                  
+                  console.log(bus_location_list.length)
+                }
+              }
+            }
+          }
+          xmlhttp.open("GET", file_path, false); // 第3引数にfalseを与えると同期処理となるので完了を待つ
+          xmlhttp.send();
+          return {error:null};
+        };
+
+        var read_bus_location_result = ReadBusLocationAccumulation("buslocation_data/bus_location_Tatsu72.302003.2.json");
+        console.log(read_bus_location_result.error)
+        console.log("output length")
+        console.log(bus_location_list.length)
+
         // バスルート表示
         var directionsService = new google.maps.DirectionsService();
         var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
@@ -248,10 +284,10 @@
         directionsDisplay.setMap(map);
         var route_request = {
 //           origin: { location: new google.maps.LatLng(35.681565,139.920046) },
-          origin: bus_location_example[0],
+          origin: bus_location_list[0],
 //           destination: { location: new google.maps.LatLng(35.68369,139.908180) },
-          destination: bus_location_example[bus_location_example.length-1],
-          waypoints: bus_location_example.slice(1, bus_location_example.length-1),
+          destination: bus_location_list[23-1],
+          waypoints: bus_location_list.slice(1, 23-1),
 //          waypoints: [
 //            { location: new google.maps.LatLng(35.684961,139.930923) },
 //            { location: new google.maps.LatLng(35.685,139.958180) },

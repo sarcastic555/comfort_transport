@@ -250,6 +250,7 @@
 
         // バスロケーション情報の蓄積を読み込む
         var ReadBusLocationAccumulation = function(file_path){
+          var bus_latlon_list = []
           console.log(file_path);
 　　  　　var xmlhttp = new XMLHttpRequest();
           xmlhttp.onreadystatechange = function () {
@@ -259,7 +260,7 @@
                 console.log("succeed")
                 console.log(data.length)
                 for (step = 0;step<data.length;step++) {
-                  bus_location_list.push({lat: Number(data[step].lat), lng: Number(data[step].long)})
+                  bus_latlon_list.push({lat: Number(data[step].lat), lng: Number(data[step].long)})
                   console.log(bus_location_list.length)
                   console.log(bus_location_list[step])
                 }
@@ -268,26 +269,40 @@
           }
           xmlhttp.open("GET", file_path, false); // 第3引数にfalseを与えると同期処理となるので完了を待つ
           xmlhttp.send();
-          return {error:null};
+          return {list:bus_latlon_list};
         };
 
-        var read_bus_location_result = ReadBusLocationAccumulation("buslocation_data/bus_location_Tatsu72.302003.2.json");
-        console.log(read_bus_location_result.error)
+        var read_bus_location_result1 = ReadBusLocationAccumulation("buslocation_data/bus_location_Tatsu72.302003.2.json");
         console.log("output length")
-        console.log(bus_location_list.length)
+        console.log(read_bus_location_result1.list.length)
 
         // バスルート表示
-        var flightPath = new google.maps.Polyline({
-          path: bus_location_list,
+        var flightPath1 = new google.maps.Polyline({
+          path: read_bus_location_result1.list,
           geodesic: true,
           strokeColor: '#FF0000',
           strokeOpacity: 1.0,
           strokeWeight: 2
         });
-        flightPath.setMap(map);
+        flightPath1.setMap(map);
+
+        var read_bus_location_result2 = ReadBusLocationAccumulation("buslocation_data/bus_location_Tatsu32.307003.1.json");
+        console.log("output length")
+        console.log(read_bus_location_result2.list.length)
+
+        // バスルート表示
+        var flightPath2 = new google.maps.Polyline({
+          path: read_bus_location_result2.list,
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1.0,
+          strokeWeight: 2
+        });
+        flightPath2.setMap(map);
 
         function success(position) {
           map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
+          map.panTo(new google.maps.LatLng(35.699059, 139.416267))
         };
         function error(err){
           switch(err.code) {

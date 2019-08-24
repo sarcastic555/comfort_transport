@@ -259,10 +259,9 @@
                 console.log("succeed")
                 console.log(data.length)
                 for (step = 0;step<data.length;step++) {
-                  console.log(data[step].lat)
-                  console.log(data[step].long)
-                  bus_location_list.push({ location: new google.maps.LatLng(data[step].lat, data[step].long) })                  
+                  bus_location_list.push({lat: Number(data[step].lat), lng: Number(data[step].long)})
                   console.log(bus_location_list.length)
+                  console.log(bus_location_list[step])
                 }
               }
             }
@@ -278,32 +277,14 @@
         console.log(bus_location_list.length)
 
         // バスルート表示
-        var directionsService = new google.maps.DirectionsService();
-        var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
-
-        directionsDisplay.setMap(map);
-        var route_request = {
-//           origin: { location: new google.maps.LatLng(35.681565,139.920046) },
-          origin: bus_location_list[0],
-//           destination: { location: new google.maps.LatLng(35.68369,139.908180) },
-          destination: bus_location_list[23-1],
-          waypoints: bus_location_list.slice(1, 23-1),
-//          waypoints: [
-//            { location: new google.maps.LatLng(35.684961,139.930923) },
-//            { location: new google.maps.LatLng(35.685,139.958180) },
-//            {lat: 35.684961, lng: 139.930923},
-//            {lat: 35.685, lng: 139.958180},
-//            {lat: 35.686691, lng: 139.908180},
-//          ],
-          travelMode: 'DRIVING'
-        };
-        directionsService.route(route_request, function(route_result, status) {
-          if (status == 'OK') {
-            directionsDisplay.setDirections(route_result);
-          } else {
-            console.log("direction service error")
-          }
+        var flightPath = new google.maps.Polyline({
+          path: bus_location_list,
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1.0,
+          strokeWeight: 2
         });
+        flightPath.setMap(map);
 
         function success(position) {
           map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));

@@ -21,10 +21,12 @@
       var bus_data_file = new XMLHttpRequest();
       var buses0;
       var buses1;
+      var buses_mid;
       var num_colors = 8;
+      var load_interval = 30000;
+      var insert_locations_interval = 500;
+      var last_update_time;
       var done_first_load = false;
-      var last_update_sec;
-
 //      var bus_location_example = [
 //        {lat: 35.794675, lng: 139.540672},
 //        {lat: 35.793030, lng: 139.539191},
@@ -61,14 +63,40 @@
         map = new google.maps.Map(mapdiv, opts);
       };
 
-      function buses_copy(){
+      function buses_copy(buses_src){
+        if(!buses_src){
+          return;
+        }
+        num_buses = buses_src.length;
+        var buses_dst = Array(num_buses);
+        for(var i=0; i<num_buses; i++){
+          src = buses_src[i];
+          buses_dst[i] = new Bus(src.lat, src.lng, src.date, src.number);
+        }
+        return buses_dst;
+      }
+
+      function buses01_copy(){
         if(!buses1){
           return;
         }
         num_buses = buses1.length;
         buses0 = Array(num_buses);
         for(var i=0; i<num_buses; i++){
-          buses0[i] = Bus(buses1[i].lat, buses1[i].lng, buses1[i].date, buses1[i].number);
+          src = buses1[i];
+          buses0[i] = new Bus(src.lat, src.lng, src.date, src.number);
+        }
+      }
+
+      function buses1mid_copy(){
+        if(!buses1){
+          return;
+        }
+        num_buses = buses1.length;
+        buses_mid = Array(num_buses);
+        for(var i=0; i<num_buses; i++){
+          src = buses1[i];
+          buses_mid[i] = new Bus(src.lat, src.lng, src.date, src.number);
         }
       }
 
@@ -121,13 +149,35 @@
           buses[i].marker.setMap(map);
         }
       };
+
+      function insert_locations(){
+        if(!buses0){
+          return;
+        }
+        var now = new Date();
+        var now_milliSec = 1000 * now.getSeconds() + now.getMilliseconds();
+        var last_milliSec = 1000 * last_update_time.getSeconds() + last_update_time.getMilliseconds();
+        var passed_milliSec = (60 * 1000 + now_milliSec - last_milliSec) % (60 * 1000);
+        var alpha = passed_milliSec / load_interval;
+        for(var i=0; i<buses_mid.length; i++){
+          for(var j=0; j<buses0.length; j++){
+            if(buses0[j].number == buses_mid[i].number){
+              var lat = alpha * buses1[i].lat + (1.0 - alpha) * buses0[j].lat;
+              var lng = alpha * buses1[i].lng + (1.0 - alpha) * buses0[j].lng;
+              bus_move(buses_mid[i], lat, lng);
+              break;
+            }
+          }
+        }
+        
+      }
       
       bus_data_file.onload = function () {
         
         var text = bus_data_file.responseText
         var bus_data = JSON.parse(text);
-        delete_bus_markers(buses1);
-        buses_copy();
+        delete_bus_markers(buses_mid);
+        buses0 = buses_copy(buses1);
         buses1 = Array(bus_data.length);
         for(var i=0; i<buses1.length; i++){
           var lat = bus_data[i]["geo:lat"];
@@ -135,12 +185,11 @@
           var date = bus_data[i]["dc:date"];
           var number = Number(bus_data[i]["odpt:busNumber"]);
           buses1[i] = new Bus(lat, lng, date, number);
-          bus_move(buses1[i], lat, lng);
         }
+        buses_mid = buses_copy(buses1);
 
-        var now = new Date();
-        last_update_sec = now.getSeconds();
-        pin_bus_markers(buses1);
+        last_update_time = new Date();
+        pin_bus_markers(buses_mid);
       };
 
       function hex(s) {
@@ -218,7 +267,7 @@
 
       function update_time(){
         var now = new Date();
-        var sec = (60 + now.getSeconds() - last_update_sec) % 60;
+        var sec = (60 + now.getSeconds() - last_update_time.getSeconds()) % 60;
         var text = "最終更新から"+ sec +"秒";
         target = document.getElementById('time');
         target.innerHTML = text;
@@ -231,11 +280,12 @@
         
         // 30秒ごとにバス位置座標データを読み込む
         load_location();
-        load_location_id = setInterval("load_location()", 30000);
+        load_location_id = setInterval("load_location()", load_interval);
         
         // 1秒ごとに最終更新時間の表示を更新
-        console.log("update map")
         update_time_id = setInterval("update_time()", 1000);
+        // 0.5秒ごとにバスの位置を内挿
+        insert_locations_id = setInterval("insert_locations()", insert_locations_interval);
 
         // バス停座標を地図上にマーカー表示
         let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];

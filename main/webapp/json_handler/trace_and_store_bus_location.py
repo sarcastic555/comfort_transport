@@ -14,7 +14,8 @@ KEY = "&acl:consumerKey="
 ## key名にコロンが入っていると扱いづらいのでkey名を変更する
 key_convert_list = {
     "odpt:busNumber": "busNumber", ## バス固有番号
-    "odpt:busroutePattern": "busroutePattern", ## 運行中の系統のID
+    "odpt:busroute": "busroute", ## 運行中の系統のID
+#    "odpt:busroutePattern": "busroutePattern", ## 運行中の系統のID
     "odpt:startingBusstopPole": "startingBusstopPole", ## 始発バス停
     "odpt:terminalBusstopPole": "terminalBusstopPole", ## 終点バス停
     "odpt:fromBusstopPole": "fromBusstopPole", ## 直前に通過したバス停
@@ -23,7 +24,7 @@ key_convert_list = {
     "geo:long": "long", ## バス経度
     "dc:date": "date" ## データ更新日時 
 }
-bus_pattern_list = {} ## bus_pattern, bus_number
+bus_route_list = {} ## bus_route, bus_number
 
 def classify_bus_location_by_bus_number(company, token, output_dir, save_key_list):
     bus_location_info_list = requests.get(HTTPS + company + KEY + token).json()
@@ -31,16 +32,17 @@ def classify_bus_location_by_bus_number(company, token, output_dir, save_key_lis
 
     for bus_location_info in bus_location_info_list:
         bus_number = bus_location_info["odpt:busNumber"]
-        bus_pattern = bus_location_info["odpt:busroutePattern"].lstrip("odpt.BusroutePattern:%s." % company)
+#        bus_pattern = bus_location_info["odpt:busroutePattern"].lstrip("odpt.BusroutePattern:%s." % company)
+        bus_route = bus_location_info["odpt:busroute"].lstrip("odpt.busroute:%s." % company)
 
-        ## バスパターンが登録されていて、かつバス番号が登録したものと異なる場合、以降の処理をスキップ
-        if bus_pattern in bus_pattern_list.keys() and bus_pattern_list[bus_pattern] != bus_number:
+        ## バスルートが登録されていて、かつバス番号が登録したものと異なる場合、以降の処理をスキップ
+        if bus_route in bus_route_list.keys() and bus_route_list[bus_route] != bus_number:
             continue
-        ## バスパターンが登録されていない場合は登録して以降の処理を続ける
-        elif not bus_pattern in bus_pattern_list.keys():
-            bus_pattern_list[bus_pattern] = bus_number
-        ## その他(バスパターンが登録されていてバス番号が登録したものと一致)の場合、以降の処理を続ける
-        output_filename = "%s/bus_location_%s.csv" % (output_dir, bus_pattern)
+        ## バスルートが登録されていない場合は登録して以降の処理を続ける
+        elif not bus_route in bus_route_list.keys():
+            bus_route_list[bus_route] = bus_number
+        ## その他(バスルートが登録されていてバス番号が登録したものと一致)の場合、以降の処理を続ける
+        output_filename = "%s/bus_location_%s.csv" % (output_dir, bus_route)
         try:
             df = pd.read_csv(output_filename, index_col=0)
         except:
@@ -60,9 +62,9 @@ if __name__ == "__main__":
     ## === 設定 ===
     token = os.environ["odpt_token"]
     company = "SeibuBus"
-    save_key_list = ["odpt:busNumber", "odpt:busroutePattern", "odpt:fromBusstopPole", "odpt:toBusstopPole", "geo:lat", "geo:long", "dc:date"]
+    save_key_list = ["odpt:busNumber", "odpt:busroute", "odpt:fromBusstopPole", "odpt:toBusstopPole", "geo:lat", "geo:long", "dc:date"]
     output_dir = "../website/buslocation_data"
-    repeat_num = 1000
+    repeat_num = 20
     sleep_time = 30 ## [s]
 
     ## === 出力ディレクトリにあるファイルをすべて削除する ===

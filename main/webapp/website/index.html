@@ -65,7 +65,7 @@
 
       function buses_copy(buses_src){
         if(!buses_src){
-          return;
+          return null;
         }
         num_buses = buses_src.length;
         var buses_dst = Array(num_buses);
@@ -76,29 +76,6 @@
         return buses_dst;
       }
 
-      function buses01_copy(){
-        if(!buses1){
-          return;
-        }
-        num_buses = buses1.length;
-        buses0 = Array(num_buses);
-        for(var i=0; i<num_buses; i++){
-          src = buses1[i];
-          buses0[i] = new Bus(src.lat, src.lng, src.date, src.number);
-        }
-      }
-
-      function buses1mid_copy(){
-        if(!buses1){
-          return;
-        }
-        num_buses = buses1.length;
-        buses_mid = Array(num_buses);
-        for(var i=0; i<num_buses; i++){
-          src = buses1[i];
-          buses_mid[i] = new Bus(src.lat, src.lng, src.date, src.number);
-        }
-      }
 
       function Bus(lat, lng, date, number){
         this.lat = lat;
@@ -186,9 +163,11 @@
           var number = Number(bus_data[i]["odpt:busNumber"]);
           buses1[i] = new Bus(lat, lng, date, number);
         }
+        
         buses_mid = buses_copy(buses1);
-
+        
         last_update_time = new Date();
+        insert_locations()
         pin_bus_markers(buses_mid);
       };
 

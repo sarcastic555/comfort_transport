@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html "-//W3C//DTD XHTML 1.0 Strict//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -23,25 +20,6 @@
       var num_colors = 8;
       var done_first_load = false;
       var last_update_sec;
-
-//      var bus_location_example = [
-//        {lat: 35.794675, lng: 139.540672},
-//        {lat: 35.793030, lng: 139.539191},
-//        {lat: 35.791072, lng: 139.537281},
-//        {lat: 35.789305, lng: 139.537935},
-//        {lat: 35.788939, lng: 139.537044},
-//        {lat: 35.787660, lng: 139.534029},
-//        {lat: 35.786294, lng: 139.530531}
-//      ]
-      var bus_location_example = [
-        { location: new google.maps.LatLng(35.794675, 139.540672) },
-        { location: new google.maps.LatLng(35.793030, 139.539191) },
-        { location: new google.maps.LatLng(35.791072, 139.537281) },
-        { location: new google.maps.LatLng(35.789305, 139.537935) },
-        { location: new google.maps.LatLng(35.788939, 139.537044) },
-        { location: new google.maps.LatLng(35.787660, 139.534029) },
-        { location: new google.maps.LatLng(35.786294, 139.530531) },
-      ]
 
       function initialize() { 
         var latlng = new google.maps.LatLng(35.680865,139.767036);
@@ -241,14 +219,7 @@
           PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
         }
 
-        bus_location_list = []
-//        bus_location_list.push({ location: new google.maps.LatLng(35.786294, 139.530531) })
-//        bus_location_list.push({ location: new google.maps.LatLng(35.786294, 139.530531) })
-//        bus_location_list.push({ location: new google.maps.LatLng(35.794675, 139.540672) })
-//        bus_location_list.push({ location: new google.maps.LatLng(35.734675, 139.500672) })
-//        console.log(bus_location_list.length)
-
-        // バスロケーション情報の蓄積を読み込む
+        // バスロケーション情報の蓄積jsonを読み込む
         var ReadBusLocationAccumulation = function(file_path){
           var bus_latlon_list = []
           console.log(file_path);
@@ -257,12 +228,8 @@
             if (xmlhttp.readyState == 4) {
               if (xmlhttp.status == 200) {
                 var data = JSON.parse(xmlhttp.responseText);
-                console.log("succeed")
-                console.log(data.length)
                 for (step = 0;step<data.length;step++) {
                   bus_latlon_list.push({lat: Number(data[step].lat), lng: Number(data[step].long)})
-                  console.log(bus_location_list.length)
-                  console.log(bus_location_list[step])
                 }
               }
             }

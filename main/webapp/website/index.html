@@ -251,7 +251,7 @@
         var bus_routepattern_index_stored = read_bus_location_result1.info_list[0].busroute_index // 最初のデータのバスルートインデックスで初期化
         var route_location_list = []
         for(let i = 0; i < read_bus_location_result1.location_list.length; i++) {
-          if (read_bus_location_result1.info_list[i].busroute_index==bus_routepattern_index_stored){
+          if (read_bus_location_result1.info_list[i].busroute_index==bus_routepattern_index_stored && i < read_bus_location_result1.location_list.length-1){
             console.log(i)
             console.log("push")
             route_location_list.push(read_bus_location_result1.location_list[i])

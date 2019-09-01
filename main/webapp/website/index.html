@@ -221,7 +221,8 @@
 
         // バスロケーション情報の蓄積jsonを読み込む
         var ReadBusLocationAccumulation = function(file_path){
-          var bus_latlon_list = []
+          var bus_latlon_list = [] // 緯度経度
+          var bus_info_list = [] // バス路線ID
           console.log(file_path);
 　　  　　var xmlhttp = new XMLHttpRequest();
           xmlhttp.onreadystatechange = function () {
@@ -230,42 +231,47 @@
                 var data = JSON.parse(xmlhttp.responseText);
                 for (step = 0;step<data.length;step++) {
                   bus_latlon_list.push({lat: Number(data[step].lat), lng: Number(data[step].long)})
+                  bus_info_list.push({busroute: data[step].busroute, busroute_index: data[step].busroute_index})
                 }
               }
             }
           }
           xmlhttp.open("GET", file_path, false); // 第3引数にfalseを与えると同期処理となるので完了を待つ
           xmlhttp.send();
-          return {list:bus_latlon_list};
+          return {location_list:bus_latlon_list, info_list:bus_info_list};
         };
 
-        var read_bus_location_result1 = ReadBusLocationAccumulation("buslocation_data/bus_location_Tatsu72.302003.2.json");
+        var read_bus_location_result1 = ReadBusLocationAccumulation("buslocation_data/bus_location_all.json");
         console.log("output length")
-        console.log(read_bus_location_result1.list.length)
+        console.log(read_bus_location_result1.location_list.length)
+        console.log(read_bus_location_result1.info_list.length)
+        console.log(read_bus_location_result1.location_list[0])
+        console.log(read_bus_location_result1.info_list[0].busroute_index)
 
-        // バスルート表示
-        var flightPath1 = new google.maps.Polyline({
-          path: read_bus_location_result1.list,
-          geodesic: true,
-          strokeColor: '#FF0000',
-          strokeOpacity: 1.0,
-          strokeWeight: 2
-        });
-        flightPath1.setMap(map);
+        var bus_routepattern_index_stored = read_bus_location_result1.info_list[0].busroute_index // 最初のデータのバスルートインデックスで初期化
+        var route_location_list = []
+        for(let i = 0; i < read_bus_location_result1.location_list.length; i++) {
+          if (read_bus_location_result1.info_list[i].busroute_index==bus_routepattern_index_stored){
+            console.log(i)
+            console.log("push")
+            route_location_list.push(read_bus_location_result1.location_list[i])
+          } else {
+            console.log(i)
+            console.log("plot")
+            // バスルート表示
+            var flightPath1 = new google.maps.Polyline({
+              path: route_location_list,
+              geodesic: true,
+              strokeColor: '#FF0000',
+              strokeOpacity: 1.0,
+              strokeWeight: 2
+            });
+            flightPath1.setMap(map);
+            bus_routepattern_index_stored += 1
+            route_location_list = []
+          }
+        }
 
-        var read_bus_location_result2 = ReadBusLocationAccumulation("buslocation_data/bus_location_Tatsu32.307003.1.json");
-        console.log("output length")
-        console.log(read_bus_location_result2.list.length)
-
-        // バスルート表示
-        var flightPath2 = new google.maps.Polyline({
-          path: read_bus_location_result2.list,
-          geodesic: true,
-          strokeColor: '#FF0000',
-          strokeOpacity: 1.0,
-          strokeWeight: 2
-        });
-        flightPath2.setMap(map);
 
         function success(position) {
           map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));

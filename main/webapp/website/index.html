@@ -63,13 +63,14 @@
       };
 
       
-      function Bus(lat, lng, date, number){
+      function Bus(lat, lng, date, number, route_number){
         this.lat = lat;
         this.lng = lng;
         this.date = date;
         this.number = number;
+        this.route_number = route_number;
         var m_latlng = new google.maps.LatLng(lat, lng);
-        hash_key = number % num_colors;
+        hash_key = route_number % num_colors;
         var img_url = './bus_img/' + hash_key.toString(10) + '.png';
         var image = {
           url : img_url,
@@ -103,7 +104,7 @@
             }
           }
           if(flag == false){//新しいバスがあったとき
-            buses_mid.push(new Bus(buses1[i].lat, buses1[i].lng, buses1[i].date, buses1[i].number));
+            buses_mid.push(new Bus(buses1[i].lat, buses1[i].lng, buses1[i].date, buses1[i].number, buses1[i].route_number));
             buses_mid[buses_mid.length-1].marker.setMap(map);
           }
         }
@@ -122,7 +123,7 @@
         var buses_dst = Array(num_buses);
         for(var i=0; i<num_buses; i++){
           src = buses_src[i];
-          buses_dst[i] = new Bus(src.lat, src.lng, src.date, src.number);
+          buses_dst[i] = new Bus(src.lat, src.lng, src.date, src.number, src.route_number);
         }
         return buses_dst;
       }
@@ -166,7 +167,34 @@
             }
           }
         }
-        
+      };
+
+      function extract_busroute_number (str_busroute){
+	      var busroute_num = 0;
+	      var loop_num = 1;
+        while(loop_num<str_busroute.length){
+	        var num_tmp = str_busroute.length - loop_num;
+          if( !isNaN(str_busroute[num_tmp]) ){
+	          loop_num++;
+	          continue;
+          }
+	        else if (str_busroute[num_tmp] === "-" ){
+	          loop_num++;
+	          continue;
+	        }
+	        else{
+	          break;
+	        }
+        }
+
+        if(loop_num === 1){
+	        busroute_num = 0
+        }
+        else{
+          busroute_num = str_busroute.slice(1-loop_num)
+          busroute_num = busroute_num.replace(/-/g, "")
+        }
+        return Number(busroute_num)
       }
       
       bus_data_file.onload = function () {//バス情報ロード      
@@ -179,7 +207,8 @@
           var lng = bus_data[i]["geo:long"];
           var date = bus_data[i]["dc:date"];
           var number = Number(bus_data[i]["odpt:busNumber"]);
-          buses1[i] = new Bus(lat, lng, date, number);
+	        var route_number = extract_busroute_number(bus_data[i]["odpt:busroute"])
+          buses1[i] = new Bus(lat, lng, date, number, route_number);
         }
         
         buses_copy_1_to_mid();

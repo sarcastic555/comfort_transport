@@ -121,6 +121,34 @@
           buses[i].marker.setMap(map);
         }
       };
+
+      function extract_busroute_number (str_busroute){
+	var busroute_num = 0;
+	var loop_num = 1;
+        while(loop_num<str_busroute.length){
+	  var num_tmp = str_busroute.length - loop_num;
+          if( !isNaN(str_busroute[num_tmp]) ){
+	    loop_num++;
+	    continue;
+          }
+	  else if (str_busroute[num_tmp] === "-" ){
+	    loop_num++;
+	    continue;
+	  }
+	  else{
+	    break;
+	  }
+        }
+
+        if(loop_num === 1){
+	  busroute_num = 0
+        }
+        else{
+	  busroute_num = str_busroute.slice(1-loop_num)
+	  busroute_num = busroute_num.replace(/-/g, "")
+        }
+        return Number(busroute_num)
+      }
       
       bus_data_file.onload = function () {
         
@@ -133,7 +161,8 @@
           var lat = bus_data[i]["geo:lat"];
           var lng = bus_data[i]["geo:long"];
           var date = bus_data[i]["dc:date"];
-          var number = Number(bus_data[i]["odpt:busNumber"]);
+          //var number = Number(bus_data[i]["odpt:busNumber"]);
+	  var number = extract_busroute_number(bus_data[i]["odpt:busroute"])
           buses1[i] = new Bus(lat, lng, date, number);
           bus_move(buses1[i], lat, lng);
         }

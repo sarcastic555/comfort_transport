@@ -167,34 +167,31 @@
             }
           }
         }
-      };
+      }
 
       function extract_busroute_number (str_busroute){
-	      var busroute_num = 0;
-	      var loop_num = 1;
+        var busroute_num = 0;
+        var loop_num = 1;
         while(loop_num<str_busroute.length){
-	        var num_tmp = str_busroute.length - loop_num;
+          var num_tmp = str_busroute.length - loop_num;
           if( !isNaN(str_busroute[num_tmp]) ){
-	          loop_num++;
-	          continue;
+            loop_num++;
+            continue;
+          }else if (str_busroute[num_tmp] === "-" ){
+            loop_num++;
+            continue;
+          }else{
+            break;
           }
-	        else if (str_busroute[num_tmp] === "-" ){
-	          loop_num++;
-	          continue;
-	        }
-	        else{
-	          break;
-	        }
         }
-
+        
         if(loop_num === 1){
-	        busroute_num = 0
+          busroute_num = 0;
+        }else{
+          busroute_num = str_busroute.slice(1-loop_num);
+          busroute_num = busroute_num.replace(/-/g, "");
         }
-        else{
-          busroute_num = str_busroute.slice(1-loop_num)
-          busroute_num = busroute_num.replace(/-/g, "")
-        }
-        return Number(busroute_num)
+        return Number(busroute_num);
       }
       
       bus_data_file.onload = function () {//バス情報ロード      
@@ -207,7 +204,7 @@
           var lng = bus_data[i]["geo:long"];
           var date = bus_data[i]["dc:date"];
           var number = Number(bus_data[i]["odpt:busNumber"]);
-	        var route_number = extract_busroute_number(bus_data[i]["odpt:busroute"])
+          var route_number = extract_busroute_number(bus_data[i]["odpt:busroute"])
           buses1[i] = new Bus(lat, lng, date, number, route_number);
         }
         

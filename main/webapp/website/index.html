@@ -26,7 +26,6 @@
       var load_interval = 30000;
       var insert_locations_interval = 500;
       var last_update_time;
-      var done_first_load = false;
 //      var bus_location_example = [
 //        {lat: 35.794675, lng: 139.540672},
 //        {lat: 35.793030, lng: 139.539191},
@@ -63,20 +62,7 @@
         map = new google.maps.Map(mapdiv, opts);
       };
 
-      function buses_copy(buses_src){
-        if(!buses_src){
-          return null;
-        }
-        num_buses = buses_src.length;
-        var buses_dst = Array(num_buses);
-        for(var i=0; i<num_buses; i++){
-          src = buses_src[i];
-          buses_dst[i] = new Bus(src.lat, src.lng, src.date, src.number);
-        }
-        return buses_dst;
-      }
-
-
+      
       function Bus(lat, lng, date, number){
         this.lat = lat;
         this.lng = lng;
@@ -95,30 +81,59 @@
         });
       };
 
-      function get_marker(bus){
-        var m_latlng = new google.maps.LatLng(bus.lat, bus.lng);
-        var marker = new google.maps.Marker({
-          position: m_latlng
-        });
-        return marker
-      };
+      function buses_copy_1_to_mid(){//内挿バスデータにコピー
+        if(!buses_mid){//最初のロード時はコピー
+          buses_mid = buses_copy(buses1);
+          return;
+        }
 
-      function bus_move(bus, lat, lng){
+        var num_mid_buses = buses_mid.length;
+        var flag_array = Array(num_mid_buses);
+        for(var j=0; j<num_mid_buses; j++){
+          flag_array[j] = false;
+        }
+
+        for(var i=0; i<buses1.length; i++){
+          var flag = false;
+          for(var j=0; j<num_mid_buses; j++){
+            if(buses1[i].number == buses_mid[j].number){
+              flag = true;
+              flag_array[j] = true;
+              break;
+            }
+          }
+          if(flag == false){//新しいバスがあったとき
+            buses_mid.push(new Bus(buses1[i].lat, buses1[i].lng, buses1[i].date, buses1[i].number));
+            buses_mid[buses_mid.length-1].marker.setMap(map);
+          }
+        }
+        for(var j=0; j<num_mid_buses; j++){
+          if(flag_array[j] == false){//バスが消えたとき
+            buses_mid[j].marker.setVisible(false);
+          }
+        }
+      }
+
+      function buses_copy(buses_src){//バス情報コピー
+        if(!buses_src){
+          return null;
+        }
+        num_buses = buses_src.length;
+        var buses_dst = Array(num_buses);
+        for(var i=0; i<num_buses; i++){
+          src = buses_src[i];
+          buses_dst[i] = new Bus(src.lat, src.lng, src.date, src.number);
+        }
+        return buses_dst;
+      }
+
+      function bus_move(bus, lat, lng){//バスを動かす
         bus.lat = lat;
         bus.lng = lng;
         bus.marker.setPosition(new google.maps.LatLng(lat, lng));
       }
 
-      function delete_bus_markers(buses){
-        if(!buses){
-          return;
-        }
-        for(var i=0; i<buses.length; i++){    
-          buses[i].marker.setVisible(false);
-        }
-      }
-
-      function pin_bus_markers(buses){
+      function pin_bus_markers(buses){//バスアイコン表示
         if(!buses){
           return;
         }
@@ -127,7 +142,7 @@
         }
       };
 
-      function insert_locations(){
+      function insert_locations(){//バス位置内挿
         if(!buses0){
           return;
         }
@@ -136,12 +151,17 @@
         var last_milliSec = 1000 * last_update_time.getSeconds() + last_update_time.getMilliseconds();
         var passed_milliSec = (60 * 1000 + now_milliSec - last_milliSec) % (60 * 1000);
         var alpha = passed_milliSec / load_interval;
-        for(var i=0; i<buses_mid.length; i++){
+        for(var i=0; i<buses1.length; i++){
           for(var j=0; j<buses0.length; j++){
-            if(buses0[j].number == buses_mid[i].number){
+            if(buses0[j].number == buses1[i].number){
               var lat = alpha * buses1[i].lat + (1.0 - alpha) * buses0[j].lat;
               var lng = alpha * buses1[i].lng + (1.0 - alpha) * buses0[j].lng;
-              bus_move(buses_mid[i], lat, lng);
+              for(var k=0; k<buses_mid.length; k++){
+                if(buses1[i].number == buses_mid[k].number){
+                  bus_move(buses_mid[k], lat, lng);
+                  break;
+                }
+              }
               break;
             }
           }
@@ -149,11 +169,9 @@
         
       }
       
-      bus_data_file.onload = function () {
-        
+      bus_data_file.onload = function () {//バス情報ロード      
         var text = bus_data_file.responseText
         var bus_data = JSON.parse(text);
-        delete_bus_markers(buses_mid);
         buses0 = buses_copy(buses1);
         buses1 = Array(bus_data.length);
         for(var i=0; i<buses1.length; i++){
@@ -164,8 +182,7 @@
           buses1[i] = new Bus(lat, lng, date, number);
         }
         
-        buses_mid = buses_copy(buses1);
-        
+        buses_copy_1_to_mid();
         last_update_time = new Date();
         insert_locations()
         pin_bus_markers(buses_mid);

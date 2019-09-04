@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html "-//W3C//DTD XHTML 1.0 Strict//EN" 
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -23,6 +20,7 @@
       var buses1;
       var buses_mid;
       var num_colors = 8;
+
       var load_interval = 30000;
       var insert_locations_interval = 500;
       var last_update_time;
@@ -315,36 +313,63 @@
           PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
         }
 
-        // バスルート表示
-        var directionsService = new google.maps.DirectionsService();
-        var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
-
-        directionsDisplay.setMap(map);
-        var route_request = {
-//           origin: { location: new google.maps.LatLng(35.681565,139.920046) },
-          origin: bus_location_example[0],
-//           destination: { location: new google.maps.LatLng(35.68369,139.908180) },
-          destination: bus_location_example[bus_location_example.length-1],
-          waypoints: bus_location_example.slice(1, bus_location_example.length-1),
-//          waypoints: [
-//            { location: new google.maps.LatLng(35.684961,139.930923) },
-//            { location: new google.maps.LatLng(35.685,139.958180) },
-//            {lat: 35.684961, lng: 139.930923},
-//            {lat: 35.685, lng: 139.958180},
-//            {lat: 35.686691, lng: 139.908180},
-//          ],
-          travelMode: 'DRIVING'
-        };
-        directionsService.route(route_request, function(route_result, status) {
-          if (status == 'OK') {
-            directionsDisplay.setDirections(route_result);
-          } else {
-            console.log("direction service error")
+        // バスロケーション情報の蓄積jsonを読み込む
+        var ReadBusLocationAccumulation = function(file_path){
+          var bus_latlon_list = [] // 緯度経度
+          var bus_info_list = [] // バス路線ID
+          console.log(file_path);
+　　  　　var xmlhttp = new XMLHttpRequest();
+          xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4) {
+              if (xmlhttp.status == 200) {
+                var data = JSON.parse(xmlhttp.responseText);
+                for (step = 0;step<data.length;step++) {
+                  bus_latlon_list.push({lat: Number(data[step].lat), lng: Number(data[step].long)})
+                  bus_info_list.push({busroute: data[step].busroute, busroute_index: data[step].busroute_index})
+                }
+              }
+            }
           }
-        });
+          xmlhttp.open("GET", file_path, false); // 第3引数にfalseを与えると同期処理となるので完了を待つ
+          xmlhttp.send();
+          return {location_list:bus_latlon_list, info_list:bus_info_list};
+        };
+
+        var read_bus_location_result1 = ReadBusLocationAccumulation("buslocation_data/bus_location_all.json");
+        console.log("output length")
+        console.log(read_bus_location_result1.location_list.length)
+        console.log(read_bus_location_result1.info_list.length)
+        console.log(read_bus_location_result1.location_list[0])
+        console.log(read_bus_location_result1.info_list[0].busroute_index)
+
+        var bus_routepattern_index_stored = read_bus_location_result1.info_list[0].busroute_index // 最初のデータのバスルートインデックスで初期化
+        var route_location_list = []
+        for(let i = 0; i < read_bus_location_result1.location_list.length; i++) {
+          if (read_bus_location_result1.info_list[i].busroute_index==bus_routepattern_index_stored && i < read_bus_location_result1.location_list.length-1){
+            console.log(i)
+            console.log("push")
+            route_location_list.push(read_bus_location_result1.location_list[i])
+          } else {
+            console.log(i)
+            console.log("plot")
+            // バスルート表示
+            var flightPath1 = new google.maps.Polyline({
+              path: route_location_list,
+              geodesic: true,
+              strokeColor: '#FF0000',
+              strokeOpacity: 1.0,
+              strokeWeight: 2
+            });
+            flightPath1.setMap(map);
+            bus_routepattern_index_stored += 1
+            route_location_list = []
+          }
+        }
+
 
         function success(position) {
           map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
+          map.panTo(new google.maps.LatLng(35.699059, 139.416267))
         };
         function error(err){
           switch(err.code) {

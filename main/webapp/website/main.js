@@ -27,6 +27,33 @@ function initialize() {
     map = new google.maps.Map(mapdiv, opts);
 };
 
+function GetBusMarkerImgFromRouteNum(route_number){
+    hash_key = route_number % num_colors;
+    img_file = './bus_img/' + hash_key.toString(10) + '.png';
+    return img_file
+};
+function GetColorStringFromRouteNum(route_number){
+    hash_key = route_number % num_colors;
+    if (hash_key==0){
+	return "black";
+    } else if (hash_key==1){
+	return "red";
+    } else if (hash_key==2){
+	return "green";
+    } else if (hash_key==3){
+	return "blue";
+    } else if (hash_key==4){
+	return "yellow";
+    } else if (hash_key==5){
+	return "lightblue";
+    } else if (hash_key==6){
+	return "magenta";
+    } else if (hash_key==7){
+	return "white";
+    } else {
+	return "black";
+    }
+}
 
 function Bus(lat, lng, date, number, route_number){
     this.lat = lat;
@@ -35,10 +62,8 @@ function Bus(lat, lng, date, number, route_number){
     this.number = number;
     this.route_number = route_number;
     var m_latlng = new google.maps.LatLng(lat, lng);
-    hash_key = route_number % num_colors;
-    var img_url = './bus_img/' + hash_key.toString(10) + '.png';
     var image = {
-        url : img_url,
+        url : GetBusMarkerImgFromRouteNum(route_number),
         scaledSize : new google.maps.Size(48, 48)
     };
     this.marker = new google.maps.Marker({
@@ -179,17 +204,6 @@ bus_data_file.onload = function () {//バス情報ロード
     pin_bus_markers(buses_mid);
 };
 
-function hex(s) {
-    console.log("function hex(s)")
-    console.log(s)
-    var result="";
-    for(var i=0;i<s.length;++i){
-        var h = ("0"+s.charCodeAt(i).toString(16)).substr(-2);
-        result += h;
-    }
-    return result;
-};
-
 function PlotBusStop(url, icon_file){
     console.log(url);
     　　　　var xmlhttp = new XMLHttpRequest();
@@ -197,17 +211,9 @@ function PlotBusStop(url, icon_file){
         if (xmlhttp.readyState == 4) {
             if (xmlhttp.status == 200) {
 		var data = JSON.parse(xmlhttp.responseText);
-		//console.log(data.length);
 		for (step = 0;step<data.length;step++) {
-                    //console.log(data[step].lat);
-                    //console.log(data[step].lon);
                     var m_latlng = new google.maps.LatLng(data[step].lat,data[step].lon);
-                    //console.log(hex(data[step].busroutePattern)%8);
-                    //marker_url = getMarker(hex(data[step].busroutePattern)%8);
-                    //marker_url = getMarker(hex("aho")%8);
                     marker_url = "http://unno.jpn.org/gmap/icons/blue-dot.png"
-                    //console.log("print color");
-                    //console.log(marker_url);
                     marker = new google.maps.Marker({
 			position: m_latlng,
 			title: url,
@@ -262,8 +268,6 @@ function update_time(){
 
 function toCurrent() {
     console.log("abs")
-    console.log(hex("abc"))
-    console.log(hex("abc")%9)
     
     // 30秒ごとにバス位置座標データを読み込む
     load_location();
@@ -311,19 +315,17 @@ function toCurrent() {
     
     var bus_routepattern_index_stored = read_bus_location_result1.info_list[0].busroute_index // 最初のデータのバスルートインデックスで初期化
     var route_location_list = []
+    var busroute = "";
+    var plot_color = ""
     for(let i = 0; i < read_bus_location_result1.location_list.length; i++) {
-        if (read_bus_location_result1.info_list[i].busroute_index==bus_routepattern_index_stored && i < read_bus_location_result1.location_list.length-1){
-            console.log(i)
-            console.log("push")
-            route_location_list.push(read_bus_location_result1.location_list[i])
-        } else {
-            console.log(i)
+        if (read_bus_location_result1.info_list[i].busroute_index!=bus_routepattern_index_stored || i == read_bus_location_result1.location_list.length-1){
+	    // busroute_index(busrouteの文字列ごとにuniqueに定まる)が前回と異なる場合は、これまで蓄積したバス位置情報リストをつなげて経路としてプロットする(最後の1回の場合もプロットする)
             console.log("plot")
             // バスルート表示
             var flightPath1 = new google.maps.Polyline({
 		path: route_location_list,
 		geodesic: true,
-		strokeColor: '#FF0000',
+		strokeColor: GetColorStringFromRouteNum(extract_busroute_number(busroute)),
 		strokeOpacity: 1.0,
 		strokeWeight: 2
             });
@@ -331,6 +333,8 @@ function toCurrent() {
             bus_routepattern_index_stored += 1
             route_location_list = []
         }
+        route_location_list.push(read_bus_location_result1.location_list[i]);
+	busroute = read_bus_location_result1.info_list[i].busroute
     }
     
     

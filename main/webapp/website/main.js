@@ -39,13 +39,13 @@ function GetColorStringFromRouteNum(route_number){
     } else if (hash_key==1){
 	return "red";
     } else if (hash_key==2){
-	return "green";
+	return "#02F702"; //lightgreen (see https://lab.syncer.jp/Web/API/Google_Maps/JavaScript/Rectangle/strokeColor/)
     } else if (hash_key==3){
 	return "blue";
     } else if (hash_key==4){
 	return "yellow";
     } else if (hash_key==5){
-	return "lightblue";
+	return "cyan";
     } else if (hash_key==6){
 	return "magenta";
     } else if (hash_key==7){

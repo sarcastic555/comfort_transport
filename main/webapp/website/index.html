@@ -19,6 +19,7 @@
       var buses0;
       var buses1;
       var buses_mid;
+      var stops;
       var num_colors = 8;
 
       var load_interval = 30000;
@@ -60,13 +61,22 @@
         map = new google.maps.Map(mapdiv, opts);
       };
 
-      
-      function Bus(lat, lng, date, number, route_number){
+      function close_all_info_windows(){
+        for(var i=0; i<buses_mid.length; i++){
+          buses_mid[i].info_window.close();
+        }
+        for(var i=0; i<stops.length; i++){
+          stops[i].info_window.close();
+        }
+      }
+
+      function Bus(lat, lng, date, number, route_number, note){
         this.lat = lat;
         this.lng = lng;
         this.date = date;
         this.number = number;
         this.route_number = route_number;
+        this.note = note;
         var m_latlng = new google.maps.LatLng(lat, lng);
         hash_key = route_number % num_colors;
         var img_url = './bus_img/' + hash_key.toString(10) + '.png';
@@ -78,6 +88,19 @@
           position: m_latlng,
           icon:image
         });
+
+        var info_window;
+        
+        info_window = new google.maps.InfoWindow({
+          position: new google.maps.LatLng(lat, lng),
+          content: note
+        });
+        this.info_window = info_window;
+
+        google.maps.event.addDomListener(this.marker, "click", function(){
+          close_all_info_windows();
+          info_window.open(map);
+        })
       };
 
       function buses_copy_1_to_mid(){//内挿バスデータにコピー
@@ -102,7 +125,7 @@
             }
           }
           if(flag == false){//新しいバスがあったとき
-            buses_mid.push(new Bus(buses1[i].lat, buses1[i].lng, buses1[i].date, buses1[i].number, buses1[i].route_number));
+            buses_mid.push(new Bus(buses1[i].lat, buses1[i].lng, buses1[i].date, buses1[i].number, buses1[i].route_number, buses1[i].note));
             buses_mid[buses_mid.length-1].marker.setMap(map);
           }
         }
@@ -121,7 +144,7 @@
         var buses_dst = Array(num_buses);
         for(var i=0; i<num_buses; i++){
           src = buses_src[i];
-          buses_dst[i] = new Bus(src.lat, src.lng, src.date, src.number, src.route_number);
+          buses_dst[i] = new Bus(src.lat, src.lng, src.date, src.number, src.route_number, src.note);
         }
         return buses_dst;
       }
@@ -130,6 +153,7 @@
         bus.lat = lat;
         bus.lng = lng;
         bus.marker.setPosition(new google.maps.LatLng(lat, lng));
+        bus.info_window.setPosition(new google.maps.LatLng(lat, lng));
       }
 
       function pin_bus_markers(buses){//バスアイコン表示
@@ -203,7 +227,8 @@
           var date = bus_data[i]["dc:date"];
           var number = Number(bus_data[i]["odpt:busNumber"]);
           var route_number = extract_busroute_number(bus_data[i]["odpt:busroute"])
-          buses1[i] = new Bus(lat, lng, date, number, route_number);
+          var note = bus_data[i]["odpt:note"];
+          buses1[i] = new Bus(lat, lng, date, number, route_number, note);
         }
         
         buses_copy_1_to_mid();
@@ -223,36 +248,54 @@
         return result;
       };
 
+      function Stop(lat, lng, kana){
+        this.lat = lat;
+        this.lng = lng;
+        this.kana = kana;
+        var m_latlng = new google.maps.LatLng(lat, lng);
+        marker_url = "http://unno.jpn.org/gmap/icons/blue-dot.png"
+        this.marker = new google.maps.Marker({
+          position: m_latlng,
+          title: kana,
+          icon: {
+              url: marker_url
+          }
+        });
+
+        var info_window;
+        info_window = new google.maps.InfoWindow({
+          position: new google.maps.LatLng(lat, lng),
+          content: kana
+        });
+        this.info_window = info_window;
+
+        google.maps.event.addDomListener(this.marker, "click", function(){
+          close_all_info_windows();
+          info_window.open(map);
+        })
+      }
+
       function PlotBusStop(url, icon_file){
         console.log(url);
 　　　　var xmlhttp = new XMLHttpRequest();
         xmlhttp.onreadystatechange = function () {
+          console.log("ok1");
           if (xmlhttp.readyState == 4) {
+            console.log("ok2");
             if (xmlhttp.status == 200) {
+              console.log("ok3");
               var data = JSON.parse(xmlhttp.responseText);
-              //console.log(data.length);
-              for (step = 0;step<data.length;step++) {
-                //console.log(data[step].lat);
-                //console.log(data[step].lon);
-                var m_latlng = new google.maps.LatLng(data[step].lat,data[step].lon);
-                //console.log(hex(data[step].busroutePattern)%8);
-                //marker_url = getMarker(hex(data[step].busroutePattern)%8);
-                //marker_url = getMarker(hex("aho")%8);
-                marker_url = "http://unno.jpn.org/gmap/icons/blue-dot.png"
-                //console.log("print color");
-                //console.log(marker_url);
-                marker = new google.maps.Marker({
-                  position: m_latlng,
-                  title: url,
-                  icon: {
-                      url: marker_url
-                  }
-                });
-                marker.setMap(map);
+              stops = Array(data.length);
+              for(var i=0; i<data.length; i++){
+                lat = data[i].lat;
+                lng = data[i].lon;
+                kana = data[i].kana;
+                stops[i] = new Stop(lat, lng, kana);
+                stops[i].marker.setMap(map);
               }
             }
           }
-        }
+        }     
         xmlhttp.open("GET",url);
         xmlhttp.send();
       };
@@ -308,7 +351,8 @@
         insert_locations_id = setInterval("insert_locations()", insert_locations_interval);
 
         // バス停座標を地図上にマーカー表示
-        let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+        //let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+        let bus_company_list = ["SeibuBus"];
         for(let i = 0; i < bus_company_list.length; i++) {
           PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
         }

@@ -213,13 +213,11 @@ function PlotBusStop(url, icon_file){
 		var data = JSON.parse(xmlhttp.responseText);
 		for (step = 0;step<data.length;step++) {
                     var m_latlng = new google.maps.LatLng(data[step].lat,data[step].lon);
-                    marker_url = "http://unno.jpn.org/gmap/icons/blue-dot.png"
+                    marker_url = "icon_img/blue-dot.png"
                     marker = new google.maps.Marker({
 			position: m_latlng,
 			title: url,
-			icon: {
-			    url: marker_url
-			}
+			icon: marker_url
                     });
                     marker.setMap(map);
 		}

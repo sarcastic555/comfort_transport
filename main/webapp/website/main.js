@@ -5,7 +5,6 @@ var buses0;
 var buses1;
 var buses_mid;
 var num_colors = 8;
-
 var load_interval = 30000;
 var insert_locations_interval = 500;
 var last_update_time;

@@ -72,10 +72,8 @@ function Bus(lat, lng, date, number, route_number, note){
     this.route_number = route_number;
     this.note = note;
     var m_latlng = new google.maps.LatLng(lat, lng);
-    hash_key = route_number % num_colors;
-    var img_url = './bus_img/' + hash_key.toString(10) + '.png';
     var image = {
-        url : img_url,
+        url : GetBusMarkerImgFromRouteNum(route_number),
         scaledSize : new google.maps.Size(48, 48)
     };
     this.marker = new google.maps.Marker({
@@ -329,8 +327,7 @@ function toCurrent() {
     insert_locations_id = setInterval("insert_locations()", insert_locations_interval);
     
     // バス停座標を地図上にマーカー表示
-    //let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
-    let bus_company_list = ["SeibuBus"];
+    let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
     for(let i = 0; i < bus_company_list.length; i++) {
         PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
     }

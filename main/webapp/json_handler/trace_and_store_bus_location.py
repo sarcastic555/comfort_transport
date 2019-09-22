@@ -64,7 +64,7 @@ if __name__ == "__main__":
     company = "SeibuBus"
     save_key_list = ["odpt:busNumber", "odpt:busroute", "odpt:fromBusstopPole", "odpt:toBusstopPole", "geo:lat", "geo:long", "dc:date"]
     output_dir = "../website/buslocation_data"
-    repeat_num = 20
+    repeat_num = 240
     sleep_time = 30 ## [s]
 
     ## === 出力ディレクトリにあるファイルをすべて削除する ===

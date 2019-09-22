@@ -5,7 +5,7 @@ var buses0;
 var buses1;
 var buses_mid;
 var num_colors = 8;
-
+var stops;
 var load_interval = 30000;
 var insert_locations_interval = 500;
 var last_update_time;
@@ -55,12 +55,22 @@ function GetColorStringFromRouteNum(route_number){
     }
 }
 
-function Bus(lat, lng, date, number, route_number){
+function close_all_info_windows(){
+    for(var i=0; i<buses_mid.length; i++){
+        buses_mid[i].info_window.close();
+    }
+    for(var i=0; i<stops.length; i++){
+        stops[i].info_window.close();
+    }
+}
+
+function Bus(lat, lng, date, number, route_number, note){
     this.lat = lat;
     this.lng = lng;
     this.date = date;
     this.number = number;
     this.route_number = route_number;
+    this.note = note;
     var m_latlng = new google.maps.LatLng(lat, lng);
     var image = {
         url : GetBusMarkerImgFromRouteNum(route_number),
@@ -68,8 +78,20 @@ function Bus(lat, lng, date, number, route_number){
     };
     this.marker = new google.maps.Marker({
         position: m_latlng,
+        title: note,
         icon:image
     });
+
+    var info_window;
+    info_window = new google.maps.InfoWindow({
+        position: new google.maps.LatLng(lat, lng),
+        content: note
+    });
+    this.info_window = info_window;
+    google.maps.event.addDomListener(this.marker, "click", function(){
+        close_all_info_windows();
+        info_window.open(map);
+    })
 };
 
 function buses_copy_1_to_mid(){//内挿バスデータにコピー
@@ -88,13 +110,13 @@ function buses_copy_1_to_mid(){//内挿バスデータにコピー
         var flag = false;
         for(var j=0; j<num_mid_buses; j++){
             if(buses1[i].number == buses_mid[j].number){
-		flag = true;
-		flag_array[j] = true;
-		break;
+                flag = true;
+                flag_array[j] = true;
+                break;
             }
         }
         if(flag == false){//新しいバスがあったとき
-            buses_mid.push(new Bus(buses1[i].lat, buses1[i].lng, buses1[i].date, buses1[i].number, buses1[i].route_number));
+            buses_mid.push(new Bus(buses1[i].lat, buses1[i].lng, buses1[i].date, buses1[i].number, buses1[i].route_number, buses1[i].note));
             buses_mid[buses_mid.length-1].marker.setMap(map);
         }
     }
@@ -113,7 +135,7 @@ function buses_copy(buses_src){//バス情報コピー
     var buses_dst = Array(num_buses);
     for(var i=0; i<num_buses; i++){
         src = buses_src[i];
-        buses_dst[i] = new Bus(src.lat, src.lng, src.date, src.number, src.route_number);
+        buses_dst[i] = new Bus(src.lat, src.lng, src.date, src.number, src.route_number, src.note);
     }
     return buses_dst;
 }
@@ -145,15 +167,15 @@ function insert_locations(){//バス位置内挿
     for(var i=0; i<buses1.length; i++){
         for(var j=0; j<buses0.length; j++){
             if(buses0[j].number == buses1[i].number){
-		var lat = alpha * buses1[i].lat + (1.0 - alpha) * buses0[j].lat;
-		var lng = alpha * buses1[i].lng + (1.0 - alpha) * buses0[j].lng;
-		for(var k=0; k<buses_mid.length; k++){
+                var lat = alpha * buses1[i].lat + (1.0 - alpha) * buses0[j].lat;
+                var lng = alpha * buses1[i].lng + (1.0 - alpha) * buses0[j].lng;
+                for(var k=0; k<buses_mid.length; k++){
                     if(buses1[i].number == buses_mid[k].number){
-			bus_move(buses_mid[k], lat, lng);
-			break;
+                        bus_move(buses_mid[k], lat, lng);
+                        break;
                     }
-		}
-		break;
+                }
+                break;
             }
         }
     }
@@ -185,7 +207,7 @@ function extract_busroute_number (str_busroute){
 }
 
 bus_data_file.onload = function () {//バス情報ロード      
-        var text = bus_data_file.responseText
+    var text = bus_data_file.responseText
     var bus_data = JSON.parse(text);
     buses0 = buses_copy(buses1);
     buses1 = Array(bus_data.length);
@@ -195,7 +217,8 @@ bus_data_file.onload = function () {//バス情報ロード
         var date = bus_data[i]["dc:date"];
         var number = Number(bus_data[i]["odpt:busNumber"]);
         var route_number = extract_busroute_number(bus_data[i]["odpt:busroute"])
-        buses1[i] = new Bus(lat, lng, date, number, route_number);
+        var note = bus_data[i]["odpt:note"];
+        buses1[i] = new Bus(lat, lng, date, number, route_number, note);
     }
     
     buses_copy_1_to_mid();
@@ -204,29 +227,53 @@ bus_data_file.onload = function () {//バス情報ロード
     pin_bus_markers(buses_mid);
 };
 
+function Stop(lat, lng, kana){
+    this.lat = lat;
+    this.lng = lng;
+    this.kana = kana;
+    var m_latlng = new google.maps.LatLng(lat, lng);
+    marker_url = "http://unno.jpn.org/gmap/icons/blue-dot.png"
+    this.marker = new google.maps.Marker({
+        position: m_latlng,
+        title: kana,
+        icon: {
+            url: marker_url
+        }
+    });
+
+    var info_window;
+    info_window = new google.maps.InfoWindow({
+        position: new google.maps.LatLng(lat, lng),
+        content: kana
+    });
+    this.info_window = info_window;
+
+    google.maps.event.addDomListener(this.marker, "click", function(){
+        close_all_info_windows();
+        info_window.open(map);
+    })
+}
+
 function PlotBusStop(url, icon_file){
-    console.log(url);
-    　　　　var xmlhttp = new XMLHttpRequest();
+    var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState == 4) {
             if (xmlhttp.status == 200) {
-		var data = JSON.parse(xmlhttp.responseText);
-		for (step = 0;step<data.length;step++) {
-                    var m_latlng = new google.maps.LatLng(data[step].lat,data[step].lon);
-                    marker_url = "icon_img/blue-dot.png"
-                    marker = new google.maps.Marker({
-			position: m_latlng,
-			title: url,
-			icon: marker_url
-                    });
-                    marker.setMap(map);
-		}
+                var data = JSON.parse(xmlhttp.responseText);
+                stops = Array(data.length);
+                for(var i=0; i<data.length; i++){
+                    lat = data[i].lat;
+                    lng = data[i].lon;
+                    kana = data[i].kana;
+                    stops[i] = new Stop(lat, lng, kana);
+                    stops[i].marker.setMap(map);
+                }
             }
         }
     }
     xmlhttp.open("GET",url);
     xmlhttp.send();
-};
+}
 
 function getMarker(id){
     marker_file="red-dot.png"
@@ -257,6 +304,9 @@ function load_location(){
 };
 
 function update_time(){
+    if(!last_update_time){
+        last_update_time = new Date();
+    }
     var now = new Date();
     var sec = (60 + now.getSeconds() - last_update_time.getSeconds()) % 60;
     var text = "最終更新から"+ sec +"秒";
@@ -318,7 +368,6 @@ function toCurrent() {
     for(let i = 0; i < read_bus_location_result1.location_list.length; i++) {
         if (read_bus_location_result1.info_list[i].busroute_index!=bus_routepattern_index_stored || i == read_bus_location_result1.location_list.length-1){
 	    // busroute_index(busrouteの文字列ごとにuniqueに定まる)が前回と異なる場合は、これまで蓄積したバス位置情報リストをつなげて経路としてプロットする(最後の1回の場合もプロットする)
-            console.log("plot")
             // バスルート表示
             var flightPath1 = new google.maps.Polyline({
 		path: route_location_list,

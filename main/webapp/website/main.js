@@ -232,7 +232,8 @@ function Stop(lat, lng, kana){
     this.lng = lng;
     this.kana = kana;
     var m_latlng = new google.maps.LatLng(lat, lng);
-    marker_url = "http://unno.jpn.org/gmap/icons/blue-dot.png"
+    // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
+    marker_url = "icon_img/blue-dot.png"
     this.marker = new google.maps.Marker({
         position: m_latlng,
         title: kana,
@@ -386,11 +387,13 @@ function toCurrent() {
     
     function pin_current_location(position){
 	var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-	var marker_current_url    = "http://unno.jpn.org/gmap/icons/flag.png"
+	// (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
+	var marker_current_url    = "icon_img/flag.png"
 	var marker_current = new google.maps.Marker({
 	    position: marker_current_latlng,
 	    icon: {
-		url: marker_current_url
+		url: marker_current_url,
+		scaledSize: new google.maps.Size(40, 40)
 	    }
         });
 	marker_current.setMap(map);

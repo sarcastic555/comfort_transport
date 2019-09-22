@@ -384,10 +384,23 @@ function toCurrent() {
 	busroute = read_bus_location_result1.info_list[i].busroute
     }
     
-    
+    function pin_current_location(position){
+	var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+	var marker_current_url    = "http://unno.jpn.org/gmap/icons/flag.png"
+	var marker_current = new google.maps.Marker({
+	    position: marker_current_latlng,
+	    icon: {
+		url: marker_current_url
+	    }
+        });
+	marker_current.setMap(map);
+    };
+
+
     function success(position) {
         map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
-        map.panTo(new google.maps.LatLng(35.699059, 139.416267))
+        // map.panTo(new google.maps.LatLng(35.699059, 139.416267))
+	pin_current_location(position)
     };
     function error(err){
         switch(err.code) {

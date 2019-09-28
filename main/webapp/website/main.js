@@ -21,8 +21,8 @@ function initialize() {
     var useragent = navigator.userAgent;
     var mapdiv = document.getElementById("map_canvas");
     if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1){
-        mapdiv.style.width = '100%';
-        mapdiv.style.height = '100%';
+        mapdiv.style.width = '97%';
+        mapdiv.style.height = '93%'; //スマートフォンの場合は多少上下左右にマージンを残しておく
     }
     map = new google.maps.Map(mapdiv, opts);
 };

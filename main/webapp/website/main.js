@@ -9,7 +9,7 @@ var stops;
 var load_interval = 30000;
 var insert_locations_interval = 500;
 var last_update_time;
-
+var bus_icon_size;
 function initialize() { 
     var latlng = new google.maps.LatLng(35.680865,139.767036);
     var opts = {
@@ -17,12 +17,16 @@ function initialize() {
         center: latlng,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
+
     
     var useragent = navigator.userAgent;
     var mapdiv = document.getElementById("map_canvas");
     if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1){
         mapdiv.style.width = '97%';
-        mapdiv.style.height = '93%'; //スマートフォンの場合は多少上下左右にマージンを残しておく
+        mapdiv.style.height = '93%'; // スマートフォンの場合は多少上下左右にマージンを残しておく
+	bus_icon_size = 80; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
+    } else {
+	bus_icon_size = 48; // for PC
     }
     map = new google.maps.Map(mapdiv, opts);
 };
@@ -72,7 +76,7 @@ function Bus(lat, lng, date, number, route_number, note){
     var m_latlng = new google.maps.LatLng(lat, lng);
     var image = {
         url : GetBusMarkerImgFromRouteNum(route_number),
-        scaledSize : new google.maps.Size(48, 48)
+        scaledSize : new google.maps.Size(bus_icon_size, bus_icon_size)
     };
     this.marker = new google.maps.Marker({
         position: m_latlng,

@@ -4,12 +4,13 @@ var bus_data_file = new XMLHttpRequest();
 var buses0;
 var buses1;
 var buses_mid;
-var num_colors = 8;
+var num_colors = 7;
 var stops;
 var load_interval = 30000;
 var insert_locations_interval = 500;
 var last_update_time;
-
+var bus_icon_size;
+var bus_stop_icon_size
 function initialize() { 
     var latlng = new google.maps.LatLng(35.680865,139.767036);
     var opts = {
@@ -21,10 +22,17 @@ function initialize() {
     var useragent = navigator.userAgent;
     var mapdiv = document.getElementById("map_canvas");
     if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1){
-        mapdiv.style.width = '100%';
-        mapdiv.style.height = '100%';
+        mapdiv.style.width = '97%';
+        mapdiv.style.height = '93%'; // スマートフォンの場合は多少上下左右にマージンを残しておく
+	bus_icon_size = 80; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
+	bus_stop_icon_size = 85; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
+    } else {
+	bus_icon_size = 48; // for PC
+	bus_stop_icon_size = 48; // for PC
     }
     map = new google.maps.Map(mapdiv, opts);
+
+    toCurrent(); //現在地にジャンプしてバス停やバス位置を表示するのはデフォルトとする(クリックを要求しない)
 };
 
 function GetBusMarkerImgFromRouteNum(route_number){
@@ -48,8 +56,6 @@ function GetColorStringFromRouteNum(route_number){
 	return "cyan";
     } else if (hash_key==6){
 	return "magenta";
-    } else if (hash_key==7){
-	return "white";
     } else {
 	return "black";
     }
@@ -74,7 +80,7 @@ function Bus(lat, lng, date, number, route_number, note){
     var m_latlng = new google.maps.LatLng(lat, lng);
     var image = {
         url : GetBusMarkerImgFromRouteNum(route_number),
-        scaledSize : new google.maps.Size(48, 48)
+        scaledSize : new google.maps.Size(bus_icon_size, bus_icon_size)
     };
     this.marker = new google.maps.Marker({
         position: m_latlng,
@@ -233,12 +239,13 @@ function Stop(lat, lng, kana){
     this.kana = kana;
     var m_latlng = new google.maps.LatLng(lat, lng);
     // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
-    marker_url = "icon_img/blue-dot.png"
+    marker_url = "icon_img/busstop.png"
     this.marker = new google.maps.Marker({
         position: m_latlng,
         title: kana,
         icon: {
-            url: marker_url
+            url: marker_url,
+	    scaledSize : new google.maps.Size(bus_stop_icon_size, bus_stop_icon_size)
         }
     });
 
@@ -328,7 +335,8 @@ function toCurrent() {
     insert_locations_id = setInterval("insert_locations()", insert_locations_interval);
     
     // バス停座標を地図上にマーカー表示
-    let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+    //let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+    let bus_company_list = ["SeibuBus"]; // バス停は西武バスだけ表示する
     for(let i = 0; i < bus_company_list.length; i++) {
         PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
     }

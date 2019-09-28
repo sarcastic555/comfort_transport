@@ -17,7 +17,6 @@ function initialize() {
         center: latlng,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-
     
     var useragent = navigator.userAgent;
     var mapdiv = document.getElementById("map_canvas");
@@ -29,6 +28,8 @@ function initialize() {
 	bus_icon_size = 48; // for PC
     }
     map = new google.maps.Map(mapdiv, opts);
+
+    toCurrent(); //現在地にジャンプしてバス停やバス位置を表示するのはデフォルトとする(クリックを要求しない)
 };
 
 function GetBusMarkerImgFromRouteNum(route_number){

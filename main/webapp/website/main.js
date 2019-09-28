@@ -10,6 +10,7 @@ var load_interval = 30000;
 var insert_locations_interval = 500;
 var last_update_time;
 var bus_icon_size;
+var bus_stop_icon_size
 function initialize() { 
     var latlng = new google.maps.LatLng(35.680865,139.767036);
     var opts = {
@@ -24,8 +25,10 @@ function initialize() {
         mapdiv.style.width = '97%';
         mapdiv.style.height = '93%'; // スマートフォンの場合は多少上下左右にマージンを残しておく
 	bus_icon_size = 80; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
+	bus_stop_icon_size = 70; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
     } else {
 	bus_icon_size = 48; // for PC
+	bus_stop_icon_size = 30; // for PC
     }
     map = new google.maps.Map(mapdiv, opts);
 
@@ -241,7 +244,8 @@ function Stop(lat, lng, kana){
         position: m_latlng,
         title: kana,
         icon: {
-            url: marker_url
+            url: marker_url,
+	    scaledSize : new google.maps.Size(bus_stop_icon_size, bus_stop_icon_size)
         }
     });
 

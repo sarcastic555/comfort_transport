@@ -4,7 +4,7 @@ var bus_data_file = new XMLHttpRequest();
 var buses0;
 var buses1;
 var buses_mid;
-var num_colors = 8;
+var num_colors = 7;
 var stops;
 var load_interval = 30000;
 var insert_locations_interval = 500;
@@ -48,8 +48,6 @@ function GetColorStringFromRouteNum(route_number){
 	return "cyan";
     } else if (hash_key==6){
 	return "magenta";
-    } else if (hash_key==7){
-	return "white";
     } else {
 	return "black";
     }

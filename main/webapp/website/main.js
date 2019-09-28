@@ -328,7 +328,8 @@ function toCurrent() {
     insert_locations_id = setInterval("insert_locations()", insert_locations_interval);
     
     // バス停座標を地図上にマーカー表示
-    let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+    //let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+    let bus_company_list = ["SeibuBus"]; // バス停は西武バスだけ表示する
     for(let i = 0; i < bus_company_list.length; i++) {
         PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
     }

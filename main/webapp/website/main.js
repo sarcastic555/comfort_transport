@@ -25,10 +25,10 @@ function initialize() {
         mapdiv.style.width = '97%';
         mapdiv.style.height = '93%'; // スマートフォンの場合は多少上下左右にマージンを残しておく
 	bus_icon_size = 80; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
-	bus_stop_icon_size = 70; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
+	bus_stop_icon_size = 85; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
     } else {
 	bus_icon_size = 48; // for PC
-	bus_stop_icon_size = 30; // for PC
+	bus_stop_icon_size = 48; // for PC
     }
     map = new google.maps.Map(mapdiv, opts);
 
@@ -239,7 +239,7 @@ function Stop(lat, lng, kana){
     this.kana = kana;
     var m_latlng = new google.maps.LatLng(lat, lng);
     // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
-    marker_url = "icon_img/blue-dot.png"
+    marker_url = "icon_img/busstop.png"
     this.marker = new google.maps.Marker({
         position: m_latlng,
         title: kana,

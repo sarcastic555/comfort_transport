@@ -1,0 +1,14 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,678,Kote10,SeibuBus,2019-09-05T08:26:18+09:00,Kotesashisou.110190.2,35.797016,139.428241,Kotesashimotomachi.110189.2
+1,678,Kote10,SeibuBus,2019-09-05T08:26:43+09:00,Kotesashisou.110190.2,35.796912,139.42871,Kotesashimotomachi.110189.2
+2,678,Kote10,SeibuBus,2019-09-05T08:27:33+09:00,Kotesashisou.110190.2,35.79677299999999,139.429248,Kotesashimotomachi.110189.2
+3,678,Kote10,SeibuBus,2019-09-05T08:27:58+09:00,Kotesashisou.110190.2,35.79679,139.429265,Kotesashimotomachi.110189.2
+4,678,Kote10,SeibuBus,2019-09-05T08:28:24+09:00,Kotesashisou.110190.2,35.79677299999999,139.429265,Kotesashimotomachi.110189.2
+5,678,Kote10,SeibuBus,2019-09-05T08:28:49+09:00,Kotesashisou.110190.2,35.796599,139.430029,Kotesashimotomachi.110189.2
+6,678,Kote10,SeibuBus,2019-09-05T08:29:57+09:00,Kotesashimotomachi.110189.2,35.795697,139.43522,Kotesashichouyonchoume.110187.2
+7,678,Kote10,SeibuBus,2019-09-05T08:30:17+09:00,Kotesashichouyonchoume.110187.2,35.796929,139.435481,Kotesashiekiminamiguchi.110186.15
+8,678,Kote10,SeibuBus,2019-09-05T08:30:42+09:00,Kotesashichouyonchoume.110187.2,35.79719,139.43551499999998,Kotesashiekiminamiguchi.110186.15
+9,678,Kote10,SeibuBus,2019-09-05T08:31:32+09:00,Kotesashichouyonchoume.110187.2,35.798579,139.43608799999998,Kotesashiekiminamiguchi.110186.15
+10,678,Kote10,SeibuBus,2019-09-05T08:31:57+09:00,Kotesashichouyonchoume.110187.2,35.800124,139.43713,Kotesashiekiminamiguchi.110186.15
+11,678,Kote10,SeibuBus,2019-09-05T08:32:22+09:00,Kotesashichouyonchoume.110187.2,35.800523,139.43733799999998,Kotesashiekiminamiguchi.110186.15
+12,678,Kote10,SeibuBus,2019-09-05T08:32:47+09:00,Kotesashichouyonchoume.110187.2,35.800315,139.437529,Kotesashiekiminamiguchi.110186.15

@@ -1,0 +1,13 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,861,Ta43,SeibuBus,2019-09-05T08:26:26+09:00,Kamijukujuutaku.40041.1,35.732797,139.539527,Nishitoukyouyuubinkyoku.40031.1
+1,861,Ta43,SeibuBus,2019-09-05T08:26:26+09:00,Kamijukujuutaku.40041.1,35.732797,139.539527,Nishitoukyouyuubinkyoku.40031.1
+2,861,Ta43,SeibuBus,2019-09-05T08:27:26+09:00,Kamijukujuutaku.40041.1,35.732673,139.539803,Nishitoukyouyuubinkyoku.40031.1
+3,861,Ta43,SeibuBus,2019-09-05T08:27:26+09:00,Kamijukujuutaku.40041.1,35.732673,139.539803,Nishitoukyouyuubinkyoku.40031.1
+4,861,Ta43,SeibuBus,2019-09-05T08:28:26+09:00,Kamijukujuutaku.40041.1,35.731997,139.540475,Nishitoukyouyuubinkyoku.40031.1
+5,861,Ta43,SeibuBus,2019-09-05T08:28:26+09:00,Kamijukujuutaku.40041.1,35.731997,139.540475,Nishitoukyouyuubinkyoku.40031.1
+6,861,Ta43,SeibuBus,2019-09-05T08:29:49+09:00,Nishitoukyouyuubinkyoku.40031.1,35.73033200000001,139.5402,Tanashieki.40024.15
+7,861,Ta43,SeibuBus,2019-09-05T08:29:49+09:00,Nishitoukyouyuubinkyoku.40031.1,35.73033200000001,139.5402,Tanashieki.40024.15
+8,861,Ta43,SeibuBus,2019-09-05T08:30:49+09:00,Nishitoukyouyuubinkyoku.40031.1,35.72848300000001,139.539775,Tanashieki.40024.15
+9,861,Ta43,SeibuBus,2019-09-05T08:31:16+09:00,Nishitoukyouyuubinkyoku.40031.1,35.727877,139.539958,Tanashieki.40024.15
+10,861,Ta43,SeibuBus,2019-09-05T08:31:16+09:00,Nishitoukyouyuubinkyoku.40031.1,35.727877,139.539958,Tanashieki.40024.15
+11,861,Ta43,SeibuBus,2019-09-05T08:32:28+09:00,Nishitoukyouyuubinkyoku.40031.1,35.727882,139.539948,Tanashieki.40024.15

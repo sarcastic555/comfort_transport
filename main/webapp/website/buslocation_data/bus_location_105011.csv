@@ -1,0 +1,16 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,736,105011,SeibuBus,2019-09-05T08:26:23+09:00,Hibarigaokaekiiriguchi.40069.1,35.748953,139.54288,Hibarigaokaicchoume.40068.1
+1,736,105011,SeibuBus,2019-09-05T08:26:23+09:00,Hibarigaokaekiiriguchi.40069.1,35.748953,139.54288,Hibarigaokaicchoume.40068.1
+2,736,105011,SeibuBus,2019-09-05T08:27:17+09:00,Hibarigaokaekiiriguchi.40069.1,35.74937,139.541423,Hibarigaokaicchoume.40068.1
+3,736,105011,SeibuBus,2019-09-05T08:28:01+09:00,Hibarigaokaekiiriguchi.40069.1,35.749077,139.53953,Hibarigaokaicchoume.40068.1
+4,736,105011,SeibuBus,2019-09-05T08:28:27+09:00,Hibarigaokanichoume.40067.1,35.748773,139.538872,Nakaharashougakkou.40066.3
+5,736,105011,SeibuBus,2019-09-05T08:28:41+09:00,Hibarigaokanichoume.40067.1,35.748328,139.538442,Nakaharashougakkou.40066.3
+6,736,105011,SeibuBus,2019-09-05T08:30:00+09:00,Nakaharashougakkou.40066.3,35.747885,139.53546699999998,Hibarigaokadanchikitaguchi.40061.1
+7,736,105011,SeibuBus,2019-09-05T08:30:30+09:00,Hibarigaokadanchikitaguchi.40061.1,35.747938,139.535282,Minamisawa.40060.1
+8,736,105011,SeibuBus,2019-09-05T08:30:56+09:00,Hibarigaokadanchikitaguchi.40061.1,35.747712,139.533953,Minamisawa.40060.1
+9,736,105011,SeibuBus,2019-09-05T08:31:25+09:00,Minamisawa.40060.1,35.747513,139.53331699999998,Toukyoudou.40059.1
+10,736,105011,SeibuBus,2019-09-05T08:32:03+09:00,Minamisawa.40060.1,35.746515,139.531018,Toukyoudou.40059.1
+11,736,105011,SeibuBus,2019-09-05T08:32:27+09:00,Toukyoudou.40059.1,35.74647,139.53053799999998,Minamisawayonchoume.40058.1
+12,736,105011,SeibuBus,2019-09-05T08:32:57+09:00,Minamisawayonchoume.40058.1,35.746362,139.52957,Iommo-ruhigashikurume.40057.15
+13,736,105011,SeibuBus,2019-09-05T08:33:27+09:00,Minamisawayonchoume.40058.1,35.746047,139.527022,Iommo-ruhigashikurume.40057.15
+14,736,105011,SeibuBus,2019-09-05T08:34:29+09:00,Minamisawayonchoume.40058.1,35.746052,139.527022,Iommo-ruhigashikurume.40057.15

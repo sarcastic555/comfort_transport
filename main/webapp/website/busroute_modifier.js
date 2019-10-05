@@ -121,44 +121,43 @@ function toCurrent() {
     var route_location_list = []
     var busroute = "";
     var plot_color = ""
-    var plot_route_index = 3; //このルートインデックスのルートのみ地図上に表示
+    var plot_route_index = 0; //このルートインデックスのルートのみ地図上に表示
+
     for(let i = 0; i < read_bus_location_result1.location_list.length; i++) {
-        if (read_bus_location_result1.info_list[i].busroute_index!=bus_routepattern_index_stored || i == read_bus_location_result1.location_list.length-1){
-	    // busroute_index(busrouteの文字列ごとにuniqueに定まる)が前回と異なる場合は、これまで蓄積したバス位置情報リストをつなげて経路としてプロットする(最後の1回の場合もプロットする)
-            // バスルート表示
-	    if (bus_routepattern_index_stored == plot_route_index){
-		var flightPath1 = new google.maps.Polyline({
-		    path: route_location_list,
-		    geodesic: true,
-		    strokeColor: GetColorStringFromRouteNum(extract_busroute_number(busroute)),
-		    strokeOpacity: 1.0,
-		    strokeWeight: 2
+	console.log(i)
+	if (read_bus_location_result1.info_list[i].busroute_index==plot_route_index+1 || i == read_bus_location_result1.location_list.length-1){
+	    var flightPath1 = new google.maps.Polyline({
+		path: route_location_list,
+		geodesic: true,
+		strokeColor: GetColorStringFromRouteNum(extract_busroute_number(busroute)),
+		strokeOpacity: 1.0,
+		strokeWeight: 2
+	    });
+	    flightPath1.setMap(map);
+	    
+	    //マーカーも表示する
+	    console.log(route_location_list.length)
+	    for (let j = 0; j<route_location_list.length; j++){
+		var marker = new google.maps.Marker({
+		    position: route_location_list[j],
+		    icon: {
+			url: "icon_img/flag.png",
+			scaledSize: new google.maps.Size(40, 40)
+		    }
+                });
+                marker.setMap(map);
+		
+		infoWindow = new google.maps.InfoWindow({ // 吹き出しの追加
+		    content: String(j) // 吹き出しに表示する内容
 		});
-		flightPath1.setMap(map);
-
-		//マーカーも表示する
-		console.log(route_location_list.length)
-		for (let j = 0; j<route_location_list.length; j++){
-		    var marker = new google.maps.Marker({
-			position: route_location_list[j],
-			icon: {
-			    url: "icon_img/flag.png",
-			    scaledSize: new google.maps.Size(40, 40)
-			}
-                    });
-                    marker.setMap(map);
-
-		    infoWindow = new google.maps.InfoWindow({ // 吹き出しの追加
-			content: String(j) // 吹き出しに表示する内容
-		    });
-		    infoWindow.open(map, marker);
-		}
+		infoWindow.open(map, marker);
 	    }
-            bus_routepattern_index_stored += 1
-            route_location_list = []
+	    break;
+	}
+        if (read_bus_location_result1.info_list[i].busroute_index==plot_route_index){
+            route_location_list.push(read_bus_location_result1.location_list[i]);
+	    busroute = read_bus_location_result1.info_list[i].busroute
         }
-        route_location_list.push(read_bus_location_result1.location_list[i]);
-	busroute = read_bus_location_result1.info_list[i].busroute
     }
     
     map.panTo(new google.maps.LatLng(35.742985, 139.538275)) // ひばりヶ丘らへんにPanToする

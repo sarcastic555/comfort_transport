@@ -16,7 +16,8 @@ function initialize() {
     var opts = {
         zoom: 11,
         center: latlng,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+	draggable: false // マーカーをdraggableにするためには地図をundraggableにする必要あり
     };
     
     var useragent = navigator.userAgent;
@@ -121,7 +122,7 @@ function toCurrent() {
     var route_location_list = []
     var busroute = "";
     var plot_color = ""
-    var plot_route_index = 0; //このルートインデックスのルートのみ地図上に表示
+    var plot_route_index = 2; //このルートインデックスのルートのみ地図上に表示
 
     for(let i = 0; i < read_bus_location_result1.location_list.length; i++) {
 	console.log(i)
@@ -143,14 +144,22 @@ function toCurrent() {
 		    icon: {
 			url: "icon_img/flag.png",
 			scaledSize: new google.maps.Size(40, 40)
-		    }
+		    },
+		    draggable: true
                 });
                 marker.setMap(map);
 		
 		infoWindow = new google.maps.InfoWindow({ // 吹き出しの追加
-		    content: String(j) // 吹き出しに表示する内容
+		    content: "<p>"+String(j)+"</p><p>"+String(route_location_list[j].lat)+","+String(route_location_list[j].lat)+"</p>" // 吹き出しに表示する内容
 		});
 		infoWindow.open(map, marker);
+
+		google.maps.event.addListener( marker, 'dragend', function(ev){
+		    console.log("dragend")
+		    // イベントの引数evの、プロパティ.latLngが緯度経度。
+		    document.getElementById('latlon').value = String(ev.latLng.lat())+","+String(ev.latLng.lng());
+		});
+
 	    }
 	    break;
 	}

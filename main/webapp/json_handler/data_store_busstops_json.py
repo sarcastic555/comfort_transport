@@ -9,8 +9,8 @@ HTTPS = "https://api-tokyochallenge.odpt.org/api/v4/odpt:BusstopPole?odpt:operat
 KEY = "&acl:consumerKey="
 
 f = lambda x: True if x is None else False
-key_orig_list=["odpt:kana", "@id", "geo:lat", "geo:long", "odpt:busroutePattern"]
-key_replaced_list=["kana", "id", "lat", "lon", "busroutePattern"]
+key_orig_list=["dc:title", "odpt:kana", "@id", "geo:lat", "geo:long", "odpt:busroutePattern"]
+key_replaced_list=["name_kanji", "name_kana", "id", "lat", "lon", "busroutePattern"]
 
 def readout_json_bus_stops(company, token):
     busstops_in = requests.get(HTTPS + company + KEY + token)
@@ -23,9 +23,9 @@ def readout_json_bus_stops(company, token):
         for key_orig, key_replaced in zip(key_orig_list, key_replaced_list):
             dict_bus_stop[key_replaced] = busstop[key_orig]
         list_bus_stops.append(dict_bus_stop)
-    print(len(list_bus_stops))
+    print("Valid data size: %d" % len(list_bus_stops))
     file_name = open('../website/busstop_data/coord_busstops_' + company + '.json', 'w')
-    json.dump(list_bus_stops, file_name)
+    json.dump(list_bus_stops, file_name, ensure_ascii=False)
 
 
 

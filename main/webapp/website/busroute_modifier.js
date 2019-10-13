@@ -17,7 +17,7 @@ function initialize() {
         zoom: 11,
         center: latlng,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
-	draggable: false // マーカーをdraggableにするためには地図をundraggableにする必要あり
+	draggable: true // マーカーをdraggableにするためには地図をundraggableにする必要あると思ったがそうではない？！
     };
     
     var useragent = navigator.userAgent;
@@ -125,7 +125,6 @@ function toCurrent() {
     var plot_route_index = 2; //このルートインデックスのルートのみ地図上に表示
 
     for(let i = 0; i < read_bus_location_result1.location_list.length; i++) {
-	console.log(i)
 	if (read_bus_location_result1.info_list[i].busroute_index==plot_route_index+1 || i == read_bus_location_result1.location_list.length-1){
 	    var flightPath1 = new google.maps.Polyline({
 		path: route_location_list,
@@ -137,7 +136,6 @@ function toCurrent() {
 	    flightPath1.setMap(map);
 	    
 	    //マーカーも表示する
-	    console.log(route_location_list.length)
 	    for (let j = 0; j<route_location_list.length; j++){
 		var marker = new google.maps.Marker({
 		    position: route_location_list[j],
@@ -150,7 +148,7 @@ function toCurrent() {
                 marker.setMap(map);
 		
 		infoWindow = new google.maps.InfoWindow({ // 吹き出しの追加
-		    content: "<p>"+String(j)+"</p><p>"+String(route_location_list[j].lat)+","+String(route_location_list[j].lat)+"</p>" // 吹き出しに表示する内容
+		    content: String(j)
 		});
 		infoWindow.open(map, marker);
 

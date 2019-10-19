@@ -6,8 +6,9 @@ var buses1;
 var buses_mid;
 var num_colors = 7;
 var stops;
-var load_interval = 30000;
-var insert_locations_interval = 500;
+var load_interval = 30000; // [ms]
+var get_current_position_interval = 10000; // [ms]
+var insert_locations_interval = 500; // [ms]
 var last_update_time;
 var bus_icon_size;
 var bus_stop_icon_size
@@ -322,6 +323,43 @@ function update_time(){
     target.innerHTML = text;
 };
 
+function pin_current_location(position){
+    var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+    // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
+    var marker_current_url    = "icon_img/flag.png"
+    var marker_current = new google.maps.Marker({
+	position: marker_current_latlng,
+	icon: {
+	    url: marker_current_url,
+	    scaledSize: new google.maps.Size(40, 40)
+	}
+    });
+    marker_current.setMap(map);
+};
+
+function success(position) {
+    map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
+    // map.panTo(new google.maps.LatLng(35.699059, 139.416267))
+    pin_current_location(position)
+};
+function error(err){
+    switch(err.code) {
+    case 1: // PERMISSION_DENIED
+        window.alert("位置情報の利用が許可されていません");
+        break;
+    case 2: // POSITION_UNAVAILABLE
+        window.alert("現在位置が取得できませんでした");
+        break;
+    case 3: // TIMEOUT
+        window.alert("タイムアウトになりました");
+        break;
+    default:
+        window.alert("その他のエラー(エラーコード:"+error.code+")");
+        break;
+    }
+    output.innerHTML = "座標位置を取得できません";
+};
+
 function toCurrent() {
     console.log("abs")
     
@@ -393,51 +431,21 @@ function toCurrent() {
 	busroute = read_bus_location_result1.info_list[i].busroute
     }
     
-    function pin_current_location(position){
-	var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-	// (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
-	var marker_current_url    = "icon_img/flag.png"
-	var marker_current = new google.maps.Marker({
-	    position: marker_current_latlng,
-	    icon: {
-		url: marker_current_url,
-		scaledSize: new google.maps.Size(40, 40)
-	    }
-        });
-	marker_current.setMap(map);
-    };
 
-
-    function success(position) {
-        map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
-        // map.panTo(new google.maps.LatLng(35.699059, 139.416267))
-	pin_current_location(position)
-    };
-    function error(err){
-        switch(err.code) {
-        case 1: // PERMISSION_DENIED
-            window.alert("位置情報の利用が許可されていません");
-                break;
-        case 2: // POSITION_UNAVAILABLE
-            window.alert("現在位置が取得できませんでした");
-                break;
-        case 3: // TIMEOUT
-            window.alert("タイムアウトになりました");
-            break;
-        default:
-            window.alert("その他のエラー(エラーコード:"+error.code+")");
-                break;
-        }
-        output.innerHTML = "座標位置を取得できません";
-    };
     var output = document.getElementById("result");
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(success, error);
-    }   
-    if (!navigator.geolocation){//Geolocation apiがサポートされていない場合
-        output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
-        return;
-    }
-    
+
+    // 地図上に表示される現在地を定期的に更新
+    get_current_position(navigator);
+    get_current_position_id = setInterval("get_current_position(navigator)", get_current_position_interval);
+
 };
 
+function get_current_position(navigator){
+    if(navigator.geolocation){
+	navigator.geolocation.getCurrentPosition(success, error);
+    }   
+    if (!navigator.geolocation){//Geolocation apiがサポートされていない場合
+	output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
+	return;
+    }
+}

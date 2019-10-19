@@ -320,7 +320,6 @@ function update_time(){
     var sec = (60 + now.getSeconds() - last_update_time.getSeconds()) % 60;
     var text = "最終更新から"+ sec +"秒";
     target = document.getElementById('time');
-    target.innerHTML = text;
 };
 
 function pin_current_location(position){

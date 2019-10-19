@@ -431,13 +431,42 @@ function toCurrent() {
         output.innerHTML = "座標位置を取得できません";
     };
     var output = document.getElementById("result");
+
+
     if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(success, error);
-    }   
-    if (!navigator.geolocation){//Geolocation apiがサポートされていない場合
-        output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
-        return;
-    }
-    
+	navigator.geolocation.watchPosition( //watchPositionとすることで定期的に現在地を取得
+	    function (pos) {
+		//取得状況
+		$('#n').html((count++) + "回目");
+		$('#x').html(pos.coords.latitude);
+		$('#y').html(pos.coords.longitude);
+ 
+		var mapData = { 'x':pos.coords.latitude, 'y':pos.coords.longitude, 'balloon':'現在位置' };
+		var latlng = new google.maps.LatLng(mapData.x, mapData.y);
+		if( !map ){ //初回のみマップ生成
+		    var myOptions = { zoom: 10, center: latlng, mapTypeId: google.maps.MapTypeId.ROADMAP };
+		    map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+		    }
+		if( marker ){ //現在地マーカーが設置されている場合は消去
+		    marker.setMap(null);
+		    }
+		if( !sampleMarker ){ //初回のみ目的地マーカーを設置
+		    sampleMarker = { 'x':'34.687315', 'y':'135.526201', 'balloon':'大阪城' };
+		    makeMarker2( sampleMarker );
+		    }
+		makeMarker( mapData ); //現在地マーカーを設置
+		},
+	    function (error) {
+		var msg;
+		switch( error.code ){
+		    case 1: msg = "位置情報の利用が許可されていません"; break;
+		    case 2: msg = "位置が判定できません"; break;
+		    case 3: msg = "タイムアウトしました"; break;
+		    }
+		alert(msg);
+		});
+    } else {
+	alert("本ブラウザではGeolocationが使えません");
+	}
 };
 

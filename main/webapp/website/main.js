@@ -4,6 +4,7 @@ var bus_data_file = new XMLHttpRequest();
 var buses0;
 var buses1;
 var buses_mid;
+var person_current;
 var num_colors = 7;
 var stops;
 var load_interval = 30000; // [ms]
@@ -326,21 +327,27 @@ function pin_current_location(position){
     var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
     // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
     var marker_current_url    = "icon_img/flag.png"
-    var marker_current = new google.maps.Marker({
+    person_current = new google.maps.Marker({
 	position: marker_current_latlng,
 	icon: {
 	    url: marker_current_url,
 	    scaledSize: new google.maps.Size(40, 40)
 	}
     });
-    marker_current.setMap(map);
+    person_current.setMap(map);
+};
+
+function success_panTo(position) {
+    map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
+    pin_current_location(position)
 };
 
 function success(position) {
-    map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
-    // map.panTo(new google.maps.LatLng(35.699059, 139.416267))
-    pin_current_location(position)
+    lat = position.coords.latitude;
+    lng = position.coords.longitude;
+    person_current.setPosition(new google.maps.LatLng(lat, lng));
 };
+
 function error(err){
     switch(err.code) {
     case 1: // PERMISSION_DENIED
@@ -433,8 +440,16 @@ function toCurrent() {
 
     var output = document.getElementById("result");
 
+    // 最初の一回だけ現在地に飛んでピンを立てる
+    if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(success_panTo, error);
+    }
+    if (!navigator.geolocation){//Geolocation apiがサポートされていない場合
+        output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
+        return;
+    }
+    
     // 地図上に表示される現在地を定期的に更新
-    get_current_position(navigator);
     get_current_position_id = setInterval("get_current_position(navigator)", get_current_position_interval);
 
 };

@@ -32,6 +32,10 @@ function initialize() {
     }
     map = new google.maps.Map(mapdiv, opts);
 
+    google.maps.event.addListener(map, 'zoom_changed', function() {
+        when_zoom(map.getZoom());
+      });
+
     toCurrent(); //現在地にジャンプしてバス停やバス位置を表示するのはデフォルトとする(クリックを要求しない)
 };
 
@@ -70,6 +74,25 @@ function close_all_info_windows(){
     }
 }
 
+function get_zoom_diff(zoom){
+    return 40 * Math.pow(0.5, zoom);
+}
+
+function when_zoom(zoom){
+    diff = get_zoom_diff(zoom);
+    console.log(diff);
+    for(var i=0; i<buses_mid.length; i++){
+        lat = buses_mid[i].lat;
+        lng = buses_mid[i].lng;
+        buses_mid[i].info_window.setPosition(new google.maps.LatLng(lat+diff, lng));
+    }
+    for(var i=0; i<stops.length; i++){
+        lat = stops[i].lat;
+        lng = stops[i].lng;
+        stops[i].info_window.setPosition(new google.maps.LatLng(lat+diff, lng));
+    }
+}
+
 function Bus(lat, lng, date, number, route_number, note){
     this.lat = lat;
     this.lng = lng;
@@ -82,16 +105,29 @@ function Bus(lat, lng, date, number, route_number, note){
         url : GetBusMarkerImgFromRouteNum(route_number),
         scaledSize : new google.maps.Size(bus_icon_size, bus_icon_size)
     };
+
+    var bus_str = note.split(':')[1];
+    if(bus_str.indexOf('（') >= 0){
+        bus_str = bus_str.replace('（', '〜');
+        bus_str = bus_str.replace('）', '〜');
+    } 
+    bus_str_=bus_str.replace('〜', "<br>↓<br>")
+    while(bus_str_ !== bus_str){
+        bus_str =bus_str.replace('〜', "<br>↓<br>")
+        bus_str_=bus_str_.replace('〜', "<br>↓<br>")
+    }
+    
+    var contentString = "<h2>" + bus_str + "<\h2>"
+
     this.marker = new google.maps.Marker({
         position: m_latlng,
-        title: note,
+        title: contentString,
         icon:image
     });
-
     var info_window;
     info_window = new google.maps.InfoWindow({
         position: new google.maps.LatLng(lat, lng),
-        content: note
+        content: contentString
     });
     this.info_window = info_window;
     google.maps.event.addDomListener(this.marker, "click", function(){
@@ -150,6 +186,8 @@ function bus_move(bus, lat, lng){//バスを動かす
     bus.lat = lat;
     bus.lng = lng;
     bus.marker.setPosition(new google.maps.LatLng(lat, lng));
+    diff = get_zoom_diff(map.getZoom());
+    bus.info_window.setPosition(new google.maps.LatLng(lat+diff, lng));
 }
 
 function pin_bus_markers(buses){//バスアイコン表示

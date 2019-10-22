@@ -78,9 +78,8 @@ function get_zoom_diff(zoom){
     return 40 * Math.pow(0.5, zoom);
 }
 
-function when_zoom(zoom){
+function when_zoom(zoom){//ズームしたとき
     diff = get_zoom_diff(zoom);
-    console.log(diff);
     for(var i=0; i<buses_mid.length; i++){
         lat = buses_mid[i].lat;
         lng = buses_mid[i].lng;

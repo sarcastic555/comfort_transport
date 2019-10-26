@@ -115,6 +115,9 @@ function Bus(lat, lng, date, number, route_number, note){
         bus_str =bus_str.replace('〜', "<br>↓<br>")
         bus_str_=bus_str_.replace('〜', "<br>↓<br>")
     }
+    if(bus_str.slice(-2) == '↓'){
+        bus_str = bus_str.slice(0, -1);
+    }
     
     var contentString = "<h2>" + bus_str + "<\h2>"
 

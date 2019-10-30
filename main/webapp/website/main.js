@@ -291,10 +291,12 @@ function Stop(lat, lng, kana){
         }
     });
 
+    var contentString = "<h2>" + this.kana + "<\h2>"
+
     var info_window;
     info_window = new google.maps.InfoWindow({
         position: new google.maps.LatLng(lat, lng),
-        content: kana
+        content: contentString
     });
     this.info_window = info_window;
 

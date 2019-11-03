@@ -28,9 +28,13 @@ function initialize() {
         mapdiv.style.height = '93%'; // スマートフォンの場合は多少上下左右にマージンを残しておく
 	bus_icon_size = 80; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
 	bus_stop_icon_size = 85; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
+	user_position_marker_x = 105; // スマートフォンは画面が小さいので現在地アイコンサイズを大きくする
+	user_position_marker_y = 90; // スマートフォンは画面が小さいので現在地アイコンサイズを大きくする
     } else {
 	bus_icon_size = 48; // for PC
 	bus_stop_icon_size = 48; // for PC
+	user_position_marker_x = 60; // for PC
+	user_position_marker_y = 53; // for PC
     }
     map = new google.maps.Map(mapdiv, opts);
 
@@ -368,12 +372,12 @@ function update_time(){
 function pin_current_location(position){
     var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
     // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
-    var marker_current_url    = "icon_img/flag.png"
+    var marker_current_url    = "icon_img/user_position_marker.png"
     person_current = new google.maps.Marker({
 	position: marker_current_latlng,
 	icon: {
 	    url: marker_current_url,
-	    scaledSize: new google.maps.Size(40, 40)
+	    scaledSize: new google.maps.Size(user_position_marker_x, user_position_marker_y)
 	}
     });
     person_current.setMap(map);

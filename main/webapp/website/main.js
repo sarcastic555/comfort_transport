@@ -42,8 +42,24 @@ function initialize() {
         when_zoom(map.getZoom());
       });
 
+    pin_ogikubo();
+
     toCurrent(); //現在地にジャンプしてバス停やバス位置を表示するのはデフォルトとする(クリックを要求しない)
 };
+
+
+function pin_ogikubo(){
+    var marker_current_latlng = new google.maps.LatLng(35.704892, 139.618976);
+    var marker_current_url    = "icon_img/flag.png"
+    person_current = new google.maps.Marker({
+	position: marker_current_latlng,
+	icon: {
+	    url: marker_current_url,
+	    scaledSize: new google.maps.Size(80, 80)
+	}
+    });
+    person_current.setMap(map);
+}
 
 function GetBusMarkerImgFromRouteNum(route_number){
     hash_key = route_number % num_colors;
@@ -487,6 +503,7 @@ function toCurrent() {
     var output = document.getElementById("result");
 
     // 最初の一回だけ現在地に飛んでピンを立てる
+    
     if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(success_panTo, error);
     }

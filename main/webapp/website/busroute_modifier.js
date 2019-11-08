@@ -122,7 +122,7 @@ function toCurrent() {
     var route_location_list = []
     var busroute = "";
     var plot_color = ""
-    var plot_route_index = 2; //このルートインデックスのルートのみ地図上に表示
+    var plot_route_index = 133; //このルートインデックスのルートのみ地図上に表示
 
     for(let i = 0; i < read_bus_location_result1.location_list.length; i++) {
 	if (read_bus_location_result1.info_list[i].busroute_index==plot_route_index+1 || i == read_bus_location_result1.location_list.length-1){

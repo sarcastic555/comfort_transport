@@ -42,15 +42,13 @@ function initialize() {
         when_zoom(map.getZoom());
       });
 
-    pin_ogikubo();
-
     toCurrent(); //現在地にジャンプしてバス停やバス位置を表示するのはデフォルトとする(クリックを要求しない)
 };
 
-
+//for debug
 function pin_ogikubo(){
     var marker_current_latlng = new google.maps.LatLng(35.704892, 139.618976);
-    var marker_current_url    = "icon_img/flag.png"
+    var marker_current_url    = "icon_img/blue-dot.png"
     person_current = new google.maps.Marker({
 	position: marker_current_latlng,
 	icon: {
@@ -388,7 +386,7 @@ function update_time(){
 function pin_current_location(position){
     var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
     // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
-    var marker_current_url    = "icon_img/user_position_marker.png"
+    var marker_current_url    = "icon_img/blue-dot.png"
     person_current = new google.maps.Marker({
 	position: marker_current_latlng,
 	icon: {

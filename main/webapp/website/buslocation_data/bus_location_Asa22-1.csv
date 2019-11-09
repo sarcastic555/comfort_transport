@@ -1,0 +1,4 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,660,Asa22-1,SeibuBus,2019-09-05T08:26:13+09:00,Nishibenzaiicchoume.100086.1,35.814188,139.58625,Asakadaieki.100087.15
+1,660,Asa22-1,SeibuBus,2019-09-05T08:26:46+09:00,Nishibenzaiicchoume.100086.1,35.814414,139.586736,Asakadaieki.100087.15
+2,660,Asa22-1,SeibuBus,2019-09-05T08:27:29+09:00,Nishibenzaiicchoume.100086.1,35.814379,139.586719,Asakadaieki.100087.15

@@ -1,0 +1,13 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T09:59:42+09:00,None,35.752600232603676,139.49860604662706,Kurumenishidanchi.60050.7
+1,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:00:30+09:00,Kurumenishidanchi.60050.7,35.75404450573359,139.50109800132748,Nishidanchiiriguchi.60049.7
+2,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:01:01+09:00,Kurumenishidanchi.60050.7,35.75255687694004,139.50387650199127,Nishidanchiiriguchi.60049.7
+3,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:01:32+09:00,Nishidanchiiriguchi.60049.7,35.75151977995826,139.5030121719666,Shimosatosanchoume.60048.7
+4,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:01:44+09:00,Shimosatosanchoume.60048.7,35.75032022641113,139.50028885382847,Hakusankouen.60047.7
+5,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:01:44+09:00,Shimosatosanchoume.60048.7,35.74836565555966,139.49907216071324,Hakusankouen.60047.7
+6,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:03:03+09:00,Shimosatosanchoume.60048.7,35.74174487302548,139.51353736840065,Hakusankouen.60047.7
+7,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:03:19+09:00,Hakusankouen.60047.7,35.743591690437526,139.51369263558195,Takiyamadanchi.60045.7
+8,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:03:19+09:00,Hakusankouen.60047.7,35.74672656748135,139.514394635582,Takiyamadanchi.60045.7
+9,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:04:19+09:00,Hakusankouen.60047.7,35.74124712797454,139.52548278042605,Takiyamadanchi.60045.7
+10,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:05:00+09:00,Hakusankouen.60047.7,35.74593726241893,139.5263688306885,Takiyamadanchi.60045.7
+11,363,TakiyamaDanchiRoute,SeibuBus,2019-09-05T10:05:33+09:00,Takiyamadanchi.60045.7,35.746096092081714,139.52748419510647,Takiyamagochoume.60044.7

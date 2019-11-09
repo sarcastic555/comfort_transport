@@ -1,0 +1,5 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,329,Take20-1,SeibuBus,2019-09-05T08:26:31+09:00,Nukuibashi.75011.1,35.7132,139.49912700000002,Miyukichounishi.70002.1
+1,329,Take20-1,SeibuBus,2019-09-05T08:26:58+09:00,Miyukichounishi.70002.1,35.71471,139.49928300000002,Hitachikokusaidenkimae.70003.0
+2,329,Take20-1,SeibuBus,2019-09-05T08:27:10+09:00,Miyukichounishi.70002.1,35.715179,139.499335,Hitachikokusaidenkimae.70003.0
+3,329,Take20-1,SeibuBus,2019-09-05T08:28:00+09:00,Miyukichounishi.70002.1,35.715179,139.4993,Hitachikokusaidenkimae.70003.0

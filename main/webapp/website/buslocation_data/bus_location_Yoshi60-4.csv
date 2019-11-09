@@ -1,0 +1,8 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,550,Yoshi60-4,SeibuBus,2019-09-05T09:30:51+09:00,Tatenochou.30091.3,35.721993,139.582051,Musashinoryoumae.30092.3
+1,550,Yoshi60-4,SeibuBus,2019-09-05T09:31:10+09:00,Tatenochou.30091.3,35.72055200000001,139.582537,Musashinoryoumae.30092.3
+2,550,Yoshi60-4,SeibuBus,2019-09-05T09:32:03+09:00,Musashinoryoumae.30092.3,35.717844,139.582849,Sekimachiminaminichoume.30093.3
+3,550,Yoshi60-4,SeibuBus,2019-09-05T09:32:25+09:00,Sekimachiminaminichoume.30093.3,35.717202,139.58293600000002,Toukyousanikushougakkouiriguchi.30094.3
+4,550,Yoshi60-4,SeibuBus,2019-09-05T09:32:54+09:00,Toukyousanikushougakkouiriguchi.30094.3,35.715778,139.583127,Kichijoujidooriiriguchi.30095.3
+5,550,Yoshi60-4,SeibuBus,2019-09-05T09:33:31+09:00,Kichijoujidooriiriguchi.30095.3,35.714180999999996,139.583006,Suidoubata.30096.1
+6,550,Yoshi60-4,SeibuBus,2019-09-05T09:33:41+09:00,Kichijoujidooriiriguchi.30095.3,35.713712,139.582676,Suidoubata.30096.1

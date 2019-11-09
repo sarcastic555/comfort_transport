@@ -1,0 +1,6 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,701,Izumi39-2,SeibuBus,2019-09-05T08:26:24+09:00,Toueisatsueijomae.30037.4,35.75068370716989,139.5931441865082,Myouenjimae.30039.2
+1,701,Izumi39-2,SeibuBus,2019-09-05T08:27:00+09:00,Myouenjimae.30039.2,35.75084865724133,139.5893309828034,Ooizumigakuenekikitaguchi.30117.15
+2,701,Izumi39-2,SeibuBus,2019-09-05T08:27:11+09:00,Myouenjimae.30039.2,35.75103077850337,139.58570215938562,Ooizumigakuenekikitaguchi.30117.15
+3,701,Izumi39-2,SeibuBus,2019-09-05T08:28:01+09:00,Myouenjimae.30039.2,35.75076698321259,139.58559573247146,Ooizumigakuenekikitaguchi.30117.15
+4,701,Izumi39-2,SeibuBus,2019-09-05T08:28:31+09:00,Myouenjimae.30039.2,35.749865188552306,139.5860906908074,Ooizumigakuenekikitaguchi.30117.15

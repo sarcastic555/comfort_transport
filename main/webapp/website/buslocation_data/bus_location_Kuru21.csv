@@ -1,0 +1,8 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,10,Kuru21,SeibuBus,2019-09-05T08:26:26+09:00,Seiyuuhigashikurumetemmae.100058.1,35.77264867382122,139.54282379629512,Higashikurumedanchi.100059.15
+1,10,Kuru21,SeibuBus,2019-09-05T08:26:57+09:00,Seiyuuhigashikurumetemmae.100058.1,35.76830757771416,139.54298010185244,Higashikurumedanchi.100059.15
+2,10,Kuru21,SeibuBus,2019-09-05T08:27:27+09:00,Seiyuuhigashikurumetemmae.100058.1,35.767897811209956,139.54337819510647,Higashikurumedanchi.100059.15
+3,10,Kuru21,SeibuBus,2019-09-05T08:27:46+09:00,Seiyuuhigashikurumetemmae.100058.1,35.76626711464036,139.54272027116394,Higashikurumedanchi.100059.15
+4,10,Kuru21,SeibuBus,2019-09-05T08:28:11+09:00,Seiyuuhigashikurumetemmae.100058.1,35.765454835365716,139.54271477546308,Higashikurumedanchi.100059.15
+5,10,Kuru21,SeibuBus,2019-09-05T08:29:01+09:00,Seiyuuhigashikurumetemmae.100058.1,35.760656434128066,139.534791635582,Higashikurumedanchi.100059.15
+6,10,Kuru21,SeibuBus,2019-09-05T08:29:51+09:00,Seiyuuhigashikurumetemmae.100058.1,35.76068801769888,139.53444835581968,Higashikurumedanchi.100059.15

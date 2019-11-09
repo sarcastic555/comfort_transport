@@ -1,0 +1,7 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,344,Izumi37,SeibuBus,2019-09-05T08:26:33+09:00,Ooizumifuuchichiku.30125.1,35.770824,139.58675,Tominnouen.35005.3
+1,344,Izumi37,SeibuBus,2019-09-05T08:26:58+09:00,Ooizumifuuchichiku.30125.1,35.77217800000001,139.586455,Tominnouen.35005.3
+2,344,Izumi37,SeibuBus,2019-09-05T08:27:23+09:00,Ooizumifuuchichiku.30125.1,35.773428,139.586472,Tominnouen.35005.3
+3,344,Izumi37,SeibuBus,2019-09-05T08:27:56+09:00,Tominnouen.35005.3,35.773549,139.587202,Nishinagakubo.30151.1
+4,344,Izumi37,SeibuBus,2019-09-05T08:28:22+09:00,Tominnouen.35005.3,35.773792,139.589528,Nishinagakubo.30151.1
+5,344,Izumi37,SeibuBus,2019-09-05T08:28:53+09:00,Nishinagakubo.30151.1,35.774001,139.591768,Nagakubo.30152.1

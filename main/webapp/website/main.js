@@ -4,12 +4,15 @@ var bus_data_file = new XMLHttpRequest();
 var buses0;
 var buses1;
 var buses_mid;
-var num_colors = 8;
+var person_current;
+var num_colors = 7;
 var stops;
-var load_interval = 30000;
-var insert_locations_interval = 500;
+var load_interval = 30000; // [ms]
+var get_current_position_interval = 10000; // [ms]
+var insert_locations_interval = 500; // [ms]
 var last_update_time;
-
+var bus_icon_size;
+var bus_stop_icon_size
 function initialize() { 
     var latlng = new google.maps.LatLng(35.680865,139.767036);
     var opts = {
@@ -21,11 +24,42 @@ function initialize() {
     var useragent = navigator.userAgent;
     var mapdiv = document.getElementById("map_canvas");
     if (useragent.indexOf('iPhone') != -1 || useragent.indexOf('Android') != -1){
-        mapdiv.style.width = '100%';
-        mapdiv.style.height = '100%';
+        mapdiv.style.width = '97%';
+        mapdiv.style.height = '93%'; // スマートフォンの場合は多少上下左右にマージンを残しておく
+	bus_icon_size = 80; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
+	bus_stop_icon_size = 85; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
+	user_position_marker_x = 105; // スマートフォンは画面が小さいので現在地アイコンサイズを大きくする
+	user_position_marker_y = 90; // スマートフォンは画面が小さいので現在地アイコンサイズを大きくする
+    } else {
+	bus_icon_size = 48; // for PC
+	bus_stop_icon_size = 48; // for PC
+	user_position_marker_x = 60; // for PC
+	user_position_marker_y = 53; // for PC
     }
     map = new google.maps.Map(mapdiv, opts);
+
+    google.maps.event.addListener(map, 'zoom_changed', function() {
+        when_zoom(map.getZoom());
+      });
+
+    pin_ogikubo();
+
+    toCurrent(); //現在地にジャンプしてバス停やバス位置を表示するのはデフォルトとする(クリックを要求しない)
 };
+
+
+function pin_ogikubo(){
+    var marker_current_latlng = new google.maps.LatLng(35.704892, 139.618976);
+    var marker_current_url    = "icon_img/flag.png"
+    person_current = new google.maps.Marker({
+	position: marker_current_latlng,
+	icon: {
+	    url: marker_current_url,
+	    scaledSize: new google.maps.Size(80, 80)
+	}
+    });
+    person_current.setMap(map);
+}
 
 function GetBusMarkerImgFromRouteNum(route_number){
     hash_key = route_number % num_colors;
@@ -48,8 +82,6 @@ function GetColorStringFromRouteNum(route_number){
 	return "cyan";
     } else if (hash_key==6){
 	return "magenta";
-    } else if (hash_key==7){
-	return "white";
     } else {
 	return "black";
     }
@@ -64,6 +96,24 @@ function close_all_info_windows(){
     }
 }
 
+function get_zoom_diff(zoom){
+    return 40 * Math.pow(0.5, zoom);
+}
+
+function when_zoom(zoom){//ズームしたとき
+    diff = get_zoom_diff(zoom);
+    for(var i=0; i<buses_mid.length; i++){
+        lat = buses_mid[i].lat;
+        lng = buses_mid[i].lng;
+        buses_mid[i].info_window.setPosition(new google.maps.LatLng(lat+diff, lng));
+    }
+    for(var i=0; i<stops.length; i++){
+        lat = stops[i].lat;
+        lng = stops[i].lng;
+        stops[i].info_window.setPosition(new google.maps.LatLng(lat+diff, lng));
+    }
+}
+
 function Bus(lat, lng, date, number, route_number, note){
     this.lat = lat;
     this.lng = lng;
@@ -74,18 +124,34 @@ function Bus(lat, lng, date, number, route_number, note){
     var m_latlng = new google.maps.LatLng(lat, lng);
     var image = {
         url : GetBusMarkerImgFromRouteNum(route_number),
-        scaledSize : new google.maps.Size(48, 48)
+        scaledSize : new google.maps.Size(bus_icon_size, bus_icon_size)
     };
+
+    var bus_str = note.split(':')[1];
+    if(bus_str.indexOf('（') >= 0){
+        bus_str = bus_str.replace('（', '〜');
+        bus_str = bus_str.replace('）', '〜');
+    } 
+    bus_str_=bus_str.replace('〜', "<br>↓<br>")
+    while(bus_str_ !== bus_str){
+        bus_str =bus_str.replace('〜', "<br>↓<br>")
+        bus_str_=bus_str_.replace('〜', "<br>↓<br>")
+    }
+    if(bus_str.slice(-2) == '↓'){
+        bus_str = bus_str.slice(0, -1);
+    }
+    
+    var contentString = "<h2>" + bus_str + "<\h2>"
+
     this.marker = new google.maps.Marker({
         position: m_latlng,
-        title: note,
+        title: contentString,
         icon:image
     });
-
     var info_window;
     info_window = new google.maps.InfoWindow({
         position: new google.maps.LatLng(lat, lng),
-        content: note
+        content: contentString
     });
     this.info_window = info_window;
     google.maps.event.addDomListener(this.marker, "click", function(){
@@ -144,6 +210,8 @@ function bus_move(bus, lat, lng){//バスを動かす
     bus.lat = lat;
     bus.lng = lng;
     bus.marker.setPosition(new google.maps.LatLng(lat, lng));
+    diff = get_zoom_diff(map.getZoom());
+    bus.info_window.setPosition(new google.maps.LatLng(lat+diff, lng));
 }
 
 function pin_bus_markers(buses){//バスアイコン表示
@@ -233,19 +301,22 @@ function Stop(lat, lng, kana){
     this.kana = kana;
     var m_latlng = new google.maps.LatLng(lat, lng);
     // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
-    marker_url = "icon_img/blue-dot.png"
+    marker_url = "icon_img/busstop.png"
     this.marker = new google.maps.Marker({
         position: m_latlng,
         title: kana,
         icon: {
-            url: marker_url
+            url: marker_url,
+	    scaledSize : new google.maps.Size(bus_stop_icon_size, bus_stop_icon_size)
         }
     });
+
+    var contentString = "<h2>" + this.kana + "<\h2>"
 
     var info_window;
     info_window = new google.maps.InfoWindow({
         position: new google.maps.LatLng(lat, lng),
-        content: kana
+        content: contentString
     });
     this.info_window = info_window;
 
@@ -312,7 +383,49 @@ function update_time(){
     var sec = (60 + now.getSeconds() - last_update_time.getSeconds()) % 60;
     var text = "最終更新から"+ sec +"秒";
     target = document.getElementById('time');
-    target.innerHTML = text;
+};
+
+function pin_current_location(position){
+    var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+    // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
+    var marker_current_url    = "icon_img/user_position_marker.png"
+    person_current = new google.maps.Marker({
+	position: marker_current_latlng,
+	icon: {
+	    url: marker_current_url,
+	    scaledSize: new google.maps.Size(user_position_marker_x, user_position_marker_y)
+	}
+    });
+    person_current.setMap(map);
+};
+
+function success_panTo(position) {
+    map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
+    pin_current_location(position)
+};
+
+function success(position) {
+    lat = position.coords.latitude;
+    lng = position.coords.longitude;
+    person_current.setPosition(new google.maps.LatLng(lat, lng));
+};
+
+function error(err){
+    switch(err.code) {
+    case 1: // PERMISSION_DENIED
+        window.alert("位置情報の利用が許可されていません");
+        break;
+    case 2: // POSITION_UNAVAILABLE
+        window.alert("現在位置が取得できませんでした");
+        break;
+    case 3: // TIMEOUT
+        window.alert("タイムアウトになりました");
+        break;
+    default:
+        window.alert("その他のエラー(エラーコード:"+error.code+")");
+        break;
+    }
+    output.innerHTML = "座標位置を取得できません";
 };
 
 function toCurrent() {
@@ -328,7 +441,8 @@ function toCurrent() {
     insert_locations_id = setInterval("insert_locations()", insert_locations_interval);
     
     // バス停座標を地図上にマーカー表示
-    let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+    //let bus_company_list = ["Toei", "KantoBus", "SeibuBus", "KokusaiKogyoBus", "NishiTokyoBus", "TokyuBus"];
+    let bus_company_list = ["SeibuBus"]; // バス停は西武バスだけ表示する
     for(let i = 0; i < bus_company_list.length; i++) {
         PlotBusStop("busstop_data/coord_busstops_"+bus_company_list[i]+".json", "blue-dot.png")
     }
@@ -385,51 +499,30 @@ function toCurrent() {
 	busroute = read_bus_location_result1.info_list[i].busroute
     }
     
-    function pin_current_location(position){
-	var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-	// (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
-	var marker_current_url    = "icon_img/flag.png"
-	var marker_current = new google.maps.Marker({
-	    position: marker_current_latlng,
-	    icon: {
-		url: marker_current_url,
-		scaledSize: new google.maps.Size(40, 40)
-	    }
-        });
-	marker_current.setMap(map);
-    };
 
-
-    function success(position) {
-        map.panTo(new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
-        // map.panTo(new google.maps.LatLng(35.699059, 139.416267))
-	pin_current_location(position)
-    };
-    function error(err){
-        switch(err.code) {
-        case 1: // PERMISSION_DENIED
-            window.alert("位置情報の利用が許可されていません");
-                break;
-        case 2: // POSITION_UNAVAILABLE
-            window.alert("現在位置が取得できませんでした");
-                break;
-        case 3: // TIMEOUT
-            window.alert("タイムアウトになりました");
-            break;
-        default:
-            window.alert("その他のエラー(エラーコード:"+error.code+")");
-                break;
-        }
-        output.innerHTML = "座標位置を取得できません";
-    };
     var output = document.getElementById("result");
+
+    // 最初の一回だけ現在地に飛んでピンを立てる
+    
     if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(success, error);
-    }   
+        navigator.geolocation.getCurrentPosition(success_panTo, error);
+    }
     if (!navigator.geolocation){//Geolocation apiがサポートされていない場合
         output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
         return;
     }
     
+    // 地図上に表示される現在地を定期的に更新
+    get_current_position_id = setInterval("get_current_position(navigator)", get_current_position_interval);
+
 };
 
+function get_current_position(navigator){
+    if(navigator.geolocation){
+	navigator.geolocation.getCurrentPosition(success, error);
+    }   
+    if (!navigator.geolocation){//Geolocation apiがサポートされていない場合
+	output.innerHTML = "<p>Geolocationはあなたのブラウザーでサポートされておりません</p>";
+	return;
+    }
+}

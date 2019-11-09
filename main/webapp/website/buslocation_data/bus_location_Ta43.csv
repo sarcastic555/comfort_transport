@@ -1,0 +1,4 @@
+,busNumber,busroute,company,date,fromBusstopPole,lat,long,toBusstopPole
+0,861,Ta43,SeibuBus,2019-09-05T08:26:26+09:00,Kamijukujuutaku.40041.1,35.72797280624498,139.5396039484101,Nishitoukyouyuubinkyoku.40031.1
+1,861,Ta43,SeibuBus,2019-09-05T08:26:26+09:00,Kamijukujuutaku.40041.1,35.73240197739119,139.5405983816147,Nishitoukyouyuubinkyoku.40031.1
+2,861,Ta43,SeibuBus,2019-09-05T08:27:26+09:00,Kamijukujuutaku.40041.1,35.73281441824984,139.53946262698366,Nishitoukyouyuubinkyoku.40031.1

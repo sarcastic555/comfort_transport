@@ -28,13 +28,13 @@ function initialize() {
         mapdiv.style.height = '93%'; // スマートフォンの場合は多少上下左右にマージンを残しておく
 	bus_icon_size = 80; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
 	bus_stop_icon_size = 85; // スマートフォンは画面が小さいのでバスアイコンサイズを大きくする
-	user_position_marker_x = 105; // スマートフォンは画面が小さいので現在地アイコンサイズを大きくする
-	user_position_marker_y = 90; // スマートフォンは画面が小さいので現在地アイコンサイズを大きくする
+	user_position_marker_x = 80; // スマートフォンは画面が小さいので現在地アイコンサイズを大きくする
+	user_position_marker_y = 70; // スマートフォンは画面が小さいので現在地アイコンサイズを大きくする
     } else {
 	bus_icon_size = 48; // for PC
 	bus_stop_icon_size = 48; // for PC
-	user_position_marker_x = 60; // for PC
-	user_position_marker_y = 53; // for PC
+	user_position_marker_x = 50; // for PC
+	user_position_marker_y = 43; // for PC
     }
     map = new google.maps.Map(mapdiv, opts);
 
@@ -372,7 +372,7 @@ function update_time(){
 function pin_current_location(position){
     var marker_current_latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
     // (注) URLを指定してしまうとスマートフォンで表示されなくなってしまうのでローカルのパスを指定すること
-    var marker_current_url    = "icon_img/user_position_marker.png"
+    var marker_current_url    = "icon_img/blue-dot.png"
     person_current = new google.maps.Marker({
 	position: marker_current_latlng,
 	icon: {

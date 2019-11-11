@@ -9,6 +9,12 @@
 - 地図上のバス停アイコンをクリックするとバス停名が表示されます
 - 走行ルートは路線ごとに色分けされており、バスアイコンの色に対応しています
 
+
+![図1](https://user-images.githubusercontent.com/29055397/68590750-a4a2d700-04d2-11ea-9e3a-40a622ece8f3.PNG)
+![図2](https://user-images.githubusercontent.com/29055397/68590760-a8365e00-04d2-11ea-9b0e-e63fdd04c37b.PNG)
+![図3](https://user-images.githubusercontent.com/29055397/68590763-aa002180-04d2-11ea-9b94-c051d4b706f8.png)
+
+
 ### 動作確認済み環境
 - Google Chrome 77.0.3865.120
 - Safari 11.0.2
